@@ -2,6 +2,7 @@ import "server-only";
 import type { DatabaseSync } from "node:sqlite";
 import { env } from "./env";
 import * as core from "./core/db.mjs";
+import * as bisnis from "./core/bisnis.mjs";
 
 /**
  * KOSKU-UI — akses DB untuk komponen server.
@@ -19,6 +20,7 @@ import * as core from "./core/db.mjs";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const inti = core as unknown as Record<string, (...args: any[]) => any>;
+const modul = bisnis as unknown as Record<string, (...args: any[]) => any>;
 const konstanta = core as unknown as Record<string, string[]>;
 
 let koneksi: DatabaseSync | null = null;
@@ -173,6 +175,32 @@ export const q = {
   simpanLaporanBug: (data: { pelapor: string; halaman: string; judul: string; isi: string }) =>
     inti.simpanLaporanBug(getDb(), data) as number,
   ubahStatusBug: (id: number, status: string) => inti.ubahStatusBug(getDb(), id, status) as boolean,
+
+  /* ---- Modul bisnis (core/bisnis.mjs): bayar parsial, generate, laporan ---- */
+  bayarTagihan: (data: { tagihanId: number; jumlah: number; metode?: string; tanggal?: string | null; penggunaId?: number | null; catatan?: string }) =>
+    modul.bayarTagihan(getDb(), data) as { lunas: boolean; sisa: number; terbayar: number },
+  batalkanBayar: (riwayatId: number, penggunaId?: number | null) => modul.batalkanBayar(getDb(), riwayatId, penggunaId) as boolean,
+  generateTagihan: (data: { periode: string; jatuhTempo: string; metodeBasis?: string; jumlahTambahan?: number }) =>
+    modul.generateTagihan(getDb(), data) as { dibuat: number; dilewati: number },
+  hitungDenda: (dendaPerHari?: number) => modul.hitungDenda(getDb(), dendaPerHari ?? 0) as { id: number; nama: string; kamar: string | null; periode: string; jatuh_tempo: string; sisa: number; telat_hari: number; denda: number }[],
+  daftarKategoriPengeluaran: () => modul.daftarKategoriPengeluaran(getDb()) as { id: number; nama: string; aktif: number }[],
+  simpanKategoriPengeluaran: (nama: string) => modul.simpanKategoriPengeluaran(getDb(), nama) as number,
+  hapusKategoriPengeluaran: (id: number) => modul.hapusKategoriPengeluaran(getDb(), id) as boolean,
+  simpanPengeluaran: (data: { kategoriId: number | null; tgl: string; jumlah: number; keterangan: string; penerima?: string; bukti?: string; penggunaId?: number | null }) =>
+    modul.simpanPengeluaran(getDb(), data) as number,
+  hapusPengeluaran: (id: number) => modul.hapusPengeluaran(getDb(), id) as boolean,
+  arusKas: (opt: { dari: string; sampai: string }) => modul.arusKas(getDb(), opt) as { pemasukan: number; pengeluaran: number; bersih: number; perKategori: { kategori: string; total: number }[] },
+  agingTunggakan: () => modul.agingTunggakan(getDb()) as { baris: { id: number; nama: string; kamar: string | null; periode: string; jatuh_tempo: string; sisa: number; telat_hari: number }[]; kelompok: Record<string, { jumlah: number; total: number }> },
+  okupansi: () => modul.okupansi(getDb()) as { status: string; jumlah: number }[],
+  pemasukanPeriode: (batas = 12) => modul.pemasukanPeriode(getDb(), batas) as { periode: string; total: number }[],
+  bacaPengaturan: () => modul.bacaPengaturan(getDb()) as Record<string, string>,
+  pengaturanKos: () => modul.bacaPengaturan(getDb()) as Record<string, string>,
+  konfigDenda: () => modul.bacaKonfigDenda(getDb()) as { id: number; aktif: number; denda_per_hari: number; batas_gratis: number },
+  simpanKonfigDenda: (data: { aktif?: number; denda_per_hari: number; batas_gratis: number }) => modul.simpanKonfigDenda(getDb(), data) as void,
+  simpanPengaturan: (obj: Record<string, string>) => modul.simpanPengaturan(getDb(), obj) as void,
+  catatAktivitas: (data: { penggunaId?: number | null; aksi: string; detail?: string; ip?: string }) => modul.catatAktivitas(getDb(), data) as void,
+  daftarAktivitas: (batas = 50) => modul.daftarAktivitas(getDb(), batas) as { id: number; aksi: string; detail: string; dibuat_pada: string; nama: string | null }[],
+  paginan: (params: any) => inti.paginatedQuery(getDb(), params) as any,
 };
 
 /** Daftar peran & tier yang sah — dipakai menolak nilai liar dari cookie. */
@@ -180,14 +208,16 @@ export const PERAN_SAH: readonly string[] = konstanta.PERAN_SAH;
 export const TIER_SAH: readonly string[] = konstanta.TIER_SAH;
 export type Peran = "pemilik" | "admin" | "kasir";
 
-export function daftarPenyewaPaginated(params: any = {}) {
+export function daftarPenyewaPaginated(
+  params: import("./pagination").PaginasiParams = {},
+): import("./pagination").Paginated<PenyewaRingkas> {
   const page = Number(params.page || 1);
   const limit = Number(params.limit || 10);
   const search = String(params.search || "");
   const sort = String(params.sort || "id");
   const order = params.order === "asc" ? "asc" : "desc";
-  const status = params.status;
-  return inti.paginatedQuery(db, {
+  const status = typeof params.status === "string" ? params.status : "";
+  return inti.paginatedQuery(getDb(), {
     table: "penyewa",
     select: "penyewa.id,nama,telepon,kamar_id,kamar.nomor as kamar,tanggal_masuk,status,(SELECT COUNT(*) FROM pembayaran p WHERE p.penyewa_id=penyewa.id AND p.dibayar_pada IS NULL) as tagihan_terbuka",
     joins: "LEFT JOIN kamar ON kamar.id=penyewa.kamar_id",
@@ -200,5 +230,5 @@ export function daftarPenyewaPaginated(params: any = {}) {
     order,
     page,
     limit,
-  }) as any;
+  }) as import("./pagination").Paginated<PenyewaRingkas>;
 }

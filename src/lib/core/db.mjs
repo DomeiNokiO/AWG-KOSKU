@@ -24,7 +24,8 @@ import { dirname, resolve } from "node:path";
    ------------------------------------------------------------------------- */
 
 export function bukaDb(path) {
-  const full = resolve(process.cwd(), path);
+  // turbopackIgnore: jalur DB selalu di bawah process.cwd()/data — tracing statis tidak perlu.
+  const full = resolve(process.cwd(), /* turbopackIgnore: true */ path);
   mkdirSync(dirname(full), { recursive: true });
   const db = new DatabaseSync(full);
   db.exec("PRAGMA journal_mode = WAL;");
@@ -73,6 +74,9 @@ CREATE TABLE IF NOT EXISTS pembayaran (
   periode      TEXT NOT NULL,
   jatuh_tempo  TEXT NOT NULL,
   jumlah       INTEGER NOT NULL DEFAULT 0,
+  terbayar     INTEGER NOT NULL DEFAULT 0,
+  sisa         INTEGER NOT NULL DEFAULT 0,
+  status       TEXT NOT NULL DEFAULT 'terbuka',
   dibayar_pada TEXT,
   metode       TEXT NOT NULL DEFAULT 'transfer',
   catatan      TEXT NOT NULL DEFAULT '',
@@ -100,72 +104,6 @@ CREATE INDEX IF NOT EXISTS idx_bayar_status ON pembayaran (dibayar_pada, jatuh_t
 CREATE INDEX IF NOT EXISTS idx_penyewa_kamar ON penyewa (kamar_id);
 CREATE INDEX IF NOT EXISTS idx_penyewa_status ON penyewa (status);
 
-CREATE TABLE IF NOT EXISTS blok (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  kode TEXT NOT NULL UNIQUE,
-  nama TEXT NOT NULL,
-  aktif INTEGER NOT NULL DEFAULT 1,
-  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE TABLE IF NOT EXISTS lantai (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  blok_id INTEGER REFERENCES blok(id) ON DELETE SET NULL,
-  nama TEXT NOT NULL,
-  urutan INTEGER NOT NULL DEFAULT 0
-);
-
-CREATE TABLE IF NOT EXISTS kontrak (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  penyewa_id INTEGER NOT NULL REFERENCES penyewa(id) ON DELETE CASCADE,
-  kamar_id INTEGER NOT NULL REFERENCES kamar(id) ON DELETE RESTRICT,
-  tanggal_masuk TEXT NOT NULL,
-  tanggal_keluar TEXT,
-  durasi_bulan INTEGER NOT NULL DEFAULT 1,
-  tarif INTEGER NOT NULL DEFAULT 0,
-  deposit INTEGER NOT NULL DEFAULT 0,
-  biaya_masuk INTEGER NOT NULL DEFAULT 0,
-  status TEXT NOT NULL DEFAULT 'aktif',
-  keterangan TEXT NOT NULL DEFAULT '',
-  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now')),
-  diperbarui_pada TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE TABLE IF NOT EXISTS tagihan (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  penyewa_id INTEGER NOT NULL REFERENCES penyewa(id) ON DELETE CASCADE,
-  kontrak_id INTEGER REFERENCES kontrak(id) ON DELETE SET NULL,
-  periode TEXT NOT NULL,
-  jatuh_tempo TEXT NOT NULL,
-  total INTEGER NOT NULL DEFAULT 0,
-  terbayar INTEGER NOT NULL DEFAULT 0,
-  sisa INTEGER NOT NULL DEFAULT 0,
-  status TEXT NOT NULL DEFAULT 'terbuka',
-  diterbitkan_pada TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE TABLE IF NOT EXISTS tagihan_item (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  tagihan_id INTEGER NOT NULL REFERENCES tagihan(id) ON DELETE CASCADE,
-  jenis TEXT NOT NULL DEFAULT 'sewa',
-  keterangan TEXT NOT NULL,
-  jumlah INTEGER NOT NULL DEFAULT 0
-);
-
-CREATE TABLE IF NOT EXISTS pembayaran (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  penyewa_id INTEGER NOT NULL REFERENCES penyewa(id) ON DELETE CASCADE,
-  tagihan_id INTEGER REFERENCES tagihan(id) ON DELETE SET NULL,
-  periode TEXT NOT NULL DEFAULT '',
-  tgl_bayar TEXT NOT NULL DEFAULT (date('now')),
-  jumlah INTEGER NOT NULL DEFAULT 0,
-  metode TEXT NOT NULL DEFAULT 'tunai',
-  referensi TEXT NOT NULL DEFAULT '',
-  dicatat_oleh INTEGER,
-  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now')),
-  catatan TEXT NOT NULL DEFAULT ''
-);
-
 CREATE TABLE IF NOT EXISTS kategori_pengeluaran (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nama TEXT NOT NULL UNIQUE,
@@ -182,20 +120,6 @@ CREATE TABLE IF NOT EXISTS pengeluaran (
   bukti TEXT NOT NULL DEFAULT '',
   dicatat_oleh INTEGER,
   dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE TABLE IF NOT EXISTS fasilitas (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  kode TEXT NOT NULL UNIQUE,
-  nama TEXT NOT NULL,
-  aktif INTEGER NOT NULL DEFAULT 1
-);
-
-CREATE TABLE IF NOT EXISTS kamar_fasilitas (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  kamar_id INTEGER NOT NULL REFERENCES kamar(id) ON DELETE CASCADE,
-  fasilitas_id INTEGER NOT NULL REFERENCES fasilitas(id) ON DELETE CASCADE,
-  UNIQUE(kamar_id, fasilitas_id)
 );
 
 CREATE TABLE IF NOT EXISTS denda_konfig (
@@ -221,15 +145,43 @@ CREATE TABLE IF NOT EXISTS aktivitas (
   dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
-CREATE INDEX IF NOT EXISTS idx_tagihan_penyewa_periode ON tagihan(penyewa_id, periode);
-CREATE INDEX IF NOT EXISTS idx_tagihan_jatuhtempo_status ON tagihan(jatuh_tempo, status);
-CREATE INDEX IF NOT EXISTS idx_pembayaran_tgl ON pembayaran(tgl_bayar);
-CREATE INDEX IF NOT EXISTS idx_pengeluaran_tgl ON pengeluaran(tgl);
-CREATE INDEX IF NOT EXISTS idx_kontrak_penyewa_status ON kontrak(penyewa_id, status);
+CREATE TABLE IF NOT EXISTS riwayat_bayar (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  tagihan_id  INTEGER NOT NULL REFERENCES pembayaran(id) ON DELETE CASCADE,
+  penyewa_id  INTEGER NOT NULL REFERENCES penyewa(id) ON DELETE CASCADE,
+  jumlah      INTEGER NOT NULL DEFAULT 0,
+  metode      TEXT NOT NULL DEFAULT 'tunai',
+  tanggal     TEXT NOT NULL DEFAULT (date('now')),
+  dicatat_oleh INTEGER REFERENCES pengguna(id) ON DELETE SET NULL,
+  catatan     TEXT NOT NULL DEFAULT '',
+  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_pembayaran_jatuhtempo ON pembayaran (jatuh_tempo, dibayar_pada);
+CREATE INDEX IF NOT EXISTS idx_riwayat_tanggal ON riwayat_bayar (tanggal);
+CREATE INDEX IF NOT EXISTS idx_pengeluaran_tgl ON pengeluaran (tgl);
+CREATE INDEX IF NOT EXISTS idx_aktivitas_dibuat ON aktivitas (dibuat_pada);
 `;
 
 export function migrasi(db) {
   db.exec(SKEMA);
+
+  // DB lama (sebelum fitur bayar parsial) tidak punya kolom terbayar/sisa/status.
+  // PRAGMA table_info dipakai supaya migrasi idempoten: jalan setiap boot tanpa error.
+  const kolom = new Set(db.prepare("PRAGMA table_info(pembayaran)").all().map((c) => c.name));
+  if (!kolom.has("terbayar")) db.exec("ALTER TABLE pembayaran ADD COLUMN terbayar INTEGER NOT NULL DEFAULT 0");
+  if (!kolom.has("sisa")) db.exec("ALTER TABLE pembayaran ADD COLUMN sisa INTEGER NOT NULL DEFAULT 0");
+  if (!kolom.has("status")) db.exec("ALTER TABLE pembayaran ADD COLUMN status TEXT NOT NULL DEFAULT 'terbuka'");
+
+  // Backfill satu kali: tagihan lama yang sudah dibayar_pada = lunas.
+  db.exec(
+    `UPDATE pembayaran
+        SET terbayar = CASE WHEN dibayar_pada IS NOT NULL THEN jumlah ELSE 0 END,
+            sisa     = CASE WHEN dibayar_pada IS NOT NULL THEN 0 ELSE jumlah END,
+            status   = CASE WHEN dibayar_pada IS NOT NULL THEN 'lunas' ELSE 'terbuka' END
+      WHERE terbayar = 0 AND sisa = 0 AND status = 'terbuka'
+         OR (dibayar_pada IS NOT NULL AND status = 'terbuka')`,
+  );
 }
 
 /* -------------------------------------------------------------------------
@@ -279,14 +231,13 @@ export function ringkasan(db, tier = "free", bulan = new Date().toISOString().sl
   const satu = (sql, ...p) => Number(db.prepare(sql).get(...p)?.n ?? 0);
 
   const lunasBulanIni = satu(
-    "SELECT COALESCE(SUM(jumlah),0) AS n FROM pembayaran WHERE dibayar_pada IS NOT NULL AND substr(dibayar_pada,1,7) = ?",
+    "SELECT COALESCE(SUM(jumlah),0) AS n FROM riwayat_bayar WHERE substr(tanggal,1,7) = ?",
     bulan,
   );
   const kamarTerisi = satu("SELECT COUNT(*) AS n FROM kamar WHERE status = 'terisi'");
 
-  // Pendapatan tuntas (semua yang sudah dibayar) — dipakai sebagai angka
-  // pembanding di kartu statistik supaya kartu tidak pernah kosong.
-  const lunasTotal = satu("SELECT COALESCE(SUM(jumlah),0) AS n FROM pembayaran WHERE dibayar_pada IS NOT NULL");
+  // Total pemasukan sepanjang waktu dari riwayat pembayaran (per pendukung parsial).
+  const lunasTotal = satu("SELECT COALESCE(SUM(jumlah),0) AS n FROM riwayat_bayar");
 
   return {
     totalKamar: satu("SELECT COUNT(*) AS n FROM kamar"),
@@ -297,9 +248,9 @@ export function ringkasan(db, tier = "free", bulan = new Date().toISOString().sl
     pemasukanBulanIni: lunasBulanIni,
     pemasukanTotal: lunasTotal,
     tunggakan: satu(
-      "SELECT COUNT(*) AS n FROM pembayaran WHERE dibayar_pada IS NULL AND date(jatuh_tempo) < date('now')",
+      "SELECT COUNT(*) AS n FROM pembayaran WHERE status = 'terbuka' AND date(jatuh_tempo) < date('now')",
     ),
-    tagihanTerbuka: satu("SELECT COUNT(*) AS n FROM pembayaran WHERE dibayar_pada IS NULL"),
+    tagihanTerbuka: satu("SELECT COUNT(*) AS n FROM pembayaran WHERE status = 'terbuka'"),
     omzetTertagih: satu("SELECT COALESCE(SUM(jumlah),0) AS n FROM pembayaran"),
     omzetTertagihBulanIni: satu(
       "SELECT COALESCE(SUM(jumlah),0) AS n FROM pembayaran WHERE substr(periode,1,7) = ?",
@@ -314,8 +265,8 @@ export function ringkasan(db, tier = "free", bulan = new Date().toISOString().sl
 export function pemasukanPerBulan(db, batas = 6) {
   const rows = db
     .prepare(
-      `SELECT substr(dibayar_pada,1,7) AS periode, COALESCE(SUM(jumlah),0) AS total
-         FROM pembayaran WHERE dibayar_pada IS NOT NULL
+      `SELECT substr(tanggal,1,7) AS periode, COALESCE(SUM(jumlah),0) AS total
+         FROM riwayat_bayar
         GROUP BY periode ORDER BY periode DESC LIMIT ?`,
     )
     .all(batas);
@@ -426,11 +377,12 @@ export function ubahStatusPenyewa(db, id, status) {
 export function tagihanBelumLunas(db, batas = 100) {
   return db
     .prepare(
-      `SELECT b.id, p.nama, p.telepon, k.nomor AS kamar, b.periode, b.jatuh_tempo, b.jumlah
+      `SELECT b.id, p.nama, p.telepon, k.nomor AS kamar, b.periode, b.jatuh_tempo,
+              b.jumlah, b.terbayar, b.sisa, b.status
          FROM pembayaran b
          JOIN penyewa p ON p.id = b.penyewa_id
     LEFT JOIN kamar k ON k.id = p.kamar_id
-        WHERE b.dibayar_pada IS NULL
+        WHERE b.status = 'terbuka'
         ORDER BY date(b.jatuh_tempo) ASC, p.nama COLLATE NOCASE
         LIMIT ?`,
     )
@@ -446,8 +398,8 @@ export function daftarPembayaran(db, { cari = "", status = "semua", periode = ""
     kondisi.push("(lower(p.nama) LIKE ? OR lower(k.nomor) LIKE ? OR lower(b.periode) LIKE ?)");
     params.push(like, like, like);
   }
-  if (status === "lunas") kondisi.push("b.dibayar_pada IS NOT NULL");
-  if (status === "belum") kondisi.push("b.dibayar_pada IS NULL");
+  if (status === "lunas") kondisi.push("b.status = 'lunas'");
+  if (status === "belum") kondisi.push("b.status = 'terbuka'");
   if (periode) {
     kondisi.push("b.periode = ?");
     params.push(periode);
@@ -458,7 +410,7 @@ export function daftarPembayaran(db, { cari = "", status = "semua", periode = ""
   return db
     .prepare(
       `SELECT b.id, p.nama, p.id AS penyewa_id, k.nomor AS kamar, b.periode, b.jatuh_tempo,
-              b.jumlah, b.dibayar_pada, b.metode, b.catatan
+              b.jumlah, b.terbayar, b.sisa, b.status, b.dibayar_pada, b.metode, b.catatan
          FROM pembayaran b
          JOIN penyewa p ON p.id = b.penyewa_id
     LEFT JOIN kamar k ON k.id = p.kamar_id
@@ -484,20 +436,51 @@ export function simpanTagihan(db, { penyewaId, periode, jatuhTempo, jumlah, cata
 /** Tandai lunas. Syarat `dibayar_pada IS NULL` membuat aksi ini idempoten:
  *  klik dua kali tidak mengubah tanggal bayar yang sudah tercatat. */
 export function tandaiLunas(db, id, metode = "transfer", tanggal = null) {
-  const info = db
-    .prepare(
-      `UPDATE pembayaran SET dibayar_pada = COALESCE(?, date('now')), metode = ?
-        WHERE id = ? AND dibayar_pada IS NULL`,
-    )
-    .run(tanggal, metode, Number(id));
-  return Number(info.changes) > 0;
+  const idNum = Number(id);
+  const tgl = tanggal || new Date().toISOString().slice(0, 10);
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const tagihan = db
+      .prepare("SELECT id, penyewa_id, jumlah, terbayar FROM pembayaran WHERE id = ? AND dibayar_pada IS NULL")
+      .get(idNum);
+    if (!tagihan) { db.exec("ROLLBACK"); return false; }
+
+    const sisaBayar = Math.max(0, Number(tagihan.jumlah) - Number(tagihan.terbayar || 0));
+    db.prepare(
+      `UPDATE pembayaran
+          SET dibayar_pada = ?, metode = ?, terbayar = jumlah, sisa = 0, status = 'lunas'
+        WHERE id = ?`,
+    ).run(tgl, metode, idNum);
+
+    // Catat sisa yang ditagih lunas supaya angka pemasukan tidak pernah
+    // dihitung dari dua tabel dengan cara berbeda.
+    if (sisaBayar > 0) {
+      db.prepare(
+        `INSERT INTO riwayat_bayar (tagihan_id, penyewa_id, jumlah, metode, tanggal, catatan)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      ).run(idNum, tagihan.penyewa_id, sisaBayar, metode, tgl, "Pelunasan penuh");
+    }
+    db.exec("COMMIT");
+    return true;
+  } catch (e) {
+    db.exec("ROLLBACK");
+    throw e;
+  }
 }
 
 export function batalkanLunas(db, id) {
-  const info = db
-    .prepare("UPDATE pembayaran SET dibayar_pada = NULL WHERE id = ? AND dibayar_pada IS NOT NULL")
-    .run(Number(id));
-  return Number(info.changes) > 0;
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.prepare("DELETE FROM riwayat_bayar WHERE tagihan_id = ?").run(Number(id));
+    db.prepare(
+      "UPDATE pembayaran SET dibayar_pada = NULL, terbayar = 0, sisa = jumlah, status = 'terbuka' WHERE id = ? AND dibayar_pada IS NOT NULL",
+    ).run(Number(id));
+    db.exec("COMMIT");
+    return true;
+  } catch (e) {
+    db.exec("ROLLBACK");
+    throw e;
+  }
 }
 
 export function pembayaranTerbaru(db, batas = 8) {

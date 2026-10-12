@@ -4,7 +4,7 @@ export type PaginasiParams = {
   search?: string;
   sort?: string;
   order?: "asc" | "desc";
-} & Record<string, any>;
+} & Record<string, unknown>;
 
 export type Paginated<T> = {
   data: T[];
