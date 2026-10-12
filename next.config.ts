@@ -18,8 +18,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // nonce CSP dipasang per-request -> render tidak boleh di-cache statis.
   cacheComponents: false,
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
+  // Tidak ada `eslint.ignoreDuringBuilds` / `typescript.ignoreBuildErrors`:
+  // build wajib gagal saat ada error tipe atau lint — biar tidak lolos diam-diam.
+  // Next 16 (Turbopack) juga sudah tidak lagi memakai kunci `eslint` di config.
   async headers() {
     return [
       {
