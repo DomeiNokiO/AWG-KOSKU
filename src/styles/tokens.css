@@ -1,0 +1,100 @@
+/* ==========================================================================
+   KOSKU-UI — tokens.css
+   Sumber tunggal semua nilai desain. Ubah di sini, seluruh kit mengikuti.
+   Author: AWGNET-RACING & AGENT AI TEAM
+   ========================================================================== */
+
+:root {
+  /* --- Warna brand (satu aksen utama: biru 600) --- */
+  --k-brand:            #2563eb;
+  --k-brand-600:        #2563eb;
+  --k-brand-700:        #1d4ed8;
+  --k-brand-500:        #3b82f6;
+  --k-brand-soft:       #eff6ff;
+  --k-brand-ring:       rgba(37, 99, 235, .35);
+
+  /* --- Warna semantik --- */
+  --k-success:          #22c55e;
+  --k-success-700:      #16a34a;
+  --k-success-soft:     #dcfce7;
+  --k-warn:             #f97316;
+  --k-warn-500:         #fb923c;
+  --k-warn-soft:        #ffedd5;
+  --k-danger:           #ef4444;
+  --k-danger-700:       #dc2626;
+  --k-danger-soft:      #fee2e2;
+  --k-info:             #0ea5e9;
+  --k-info-soft:        #e0f2fe;
+  --k-violet:           #a855f7;
+  --k-violet-soft:      #f3e8ff;
+
+  /* --- Netral --- */
+  --k-bg:               #f1f5f9;
+  --k-surface:          #ffffff;
+  --k-surface-2:        #f8fafc;
+  --k-surface-3:        #f1f5f9;
+  --k-border:           #e2e8f0;
+  --k-border-strong:    #cbd5e1;
+  --k-ink:              #0f172a;
+  --k-ink-2:            #334155;
+  --k-muted:            #64748b;
+  --k-faint:            #94a3b8;
+
+  /* --- Gradien & ornamen --- */
+  --k-grad-navy:        linear-gradient(135deg, #0b2545 0%, #1e3a8a 65%, #1d4ed8 100%);
+  --k-grad-warn:        linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  --k-grad-brand:       linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+
+  /* --- Tipografi --- */
+  --k-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --k-fs-xs:   .6875rem;  /* 11px  — label uppercase tabel */
+  --k-fs-sm:   .75rem;    /* 12px  — label kartu */
+  --k-fs-md:   .875rem;   /* 14px  — body, isi tabel */
+  --k-fs-lg:   1rem;      /* 16px  — judul kartu */
+  --k-fs-xl:   1.3125rem; /* 21px  — judul halaman */
+  --k-fs-2xl:  1.625rem;  /* 26px  — angka kartu statistik */
+  --k-fs-3xl:  1.8125rem; /* 29px  — angka banner kuota */
+
+  /* --- Jarak --- */
+  --k-s1: 4px;  --k-s2: 8px;  --k-s3: 12px; --k-s4: 16px;
+  --k-s5: 20px; --k-s6: 24px; --k-s8: 32px; --k-s10: 40px;
+
+  /* --- Radius --- */
+  --k-r-sm: 8px;
+  --k-r-md: 10px;
+  --k-r-lg: 12px;
+  --k-r-xl: 16px;
+  --k-r-full: 9999px;
+
+  /* --- Bayangan --- */
+  --k-sh-sm: 0 1px 2px rgba(15, 23, 42, .06);
+  --k-sh-md: 0 4px 12px rgba(15, 23, 42, .07);
+  --k-sh-lg: 0 14px 40px rgba(15, 23, 42, .14);
+
+  /* --- Tata letak shell --- */
+  --k-sbw: 244px;      /* lebar sidebar desktop */
+  --k-topb: 64px;      /* tinggi topbar */
+}
+
+/* --- Tema gelap: hanya membalik token, tidak ada komponen yang di-hardcode --- */
+:root[data-k-theme='dark'] {
+  --k-bg:            #0b1220;
+  --k-surface:       #101a2e;
+  --k-surface-2:     #16223a;
+  --k-surface-3:     #1b2942;
+  --k-border:        #24334d;
+  --k-border-strong: #33465f;
+  --k-ink:           #e8eefb;
+  --k-ink-2:         #c3cfe4;
+  --k-muted:         #93a2bd;
+  --k-faint:         #6d7d99;
+  --k-brand-soft:    rgba(37, 99, 235, .18);
+  --k-success-soft:  rgba(34, 197, 94, .16);
+  --k-warn-soft:     rgba(249, 115, 22, .16);
+  --k-danger-soft:   rgba(239, 68, 68, .16);
+  --k-info-soft:     rgba(14, 165, 233, .16);
+  --k-violet-soft:   rgba(168, 85, 247, .16);
+  --k-sh-md: 0 4px 12px rgba(0, 0, 0, .4);
+  --k-sh-lg: 0 14px 40px rgba(0, 0, 0, .55);
+  color-scheme: dark;
+}
