@@ -14,7 +14,7 @@ export default async function HalamanPenyewa() {
   return (
     <>
       <SectionTitle judul="Penyewa" sub="Cari, urut & paginasi server-side" aksi={<Badge tone="brand">{penyewa.length} total</Badge>} />
-      <Card><PenyewaServer penyewa={penyewa as any} /></Card>
+      <Card><PenyewaServer /></Card>
     </>
   );
 }
