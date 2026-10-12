@@ -99,6 +99,133 @@ CREATE TABLE IF NOT EXISTS catatan (
 CREATE INDEX IF NOT EXISTS idx_bayar_status ON pembayaran (dibayar_pada, jatuh_tempo);
 CREATE INDEX IF NOT EXISTS idx_penyewa_kamar ON penyewa (kamar_id);
 CREATE INDEX IF NOT EXISTS idx_penyewa_status ON penyewa (status);
+
+CREATE TABLE IF NOT EXISTS blok (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kode TEXT NOT NULL UNIQUE,
+  nama TEXT NOT NULL,
+  aktif INTEGER NOT NULL DEFAULT 1,
+  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS lantai (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  blok_id INTEGER REFERENCES blok(id) ON DELETE SET NULL,
+  nama TEXT NOT NULL,
+  urutan INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS kontrak (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  penyewa_id INTEGER NOT NULL REFERENCES penyewa(id) ON DELETE CASCADE,
+  kamar_id INTEGER NOT NULL REFERENCES kamar(id) ON DELETE RESTRICT,
+  tanggal_masuk TEXT NOT NULL,
+  tanggal_keluar TEXT,
+  durasi_bulan INTEGER NOT NULL DEFAULT 1,
+  tarif INTEGER NOT NULL DEFAULT 0,
+  deposit INTEGER NOT NULL DEFAULT 0,
+  biaya_masuk INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'aktif',
+  keterangan TEXT NOT NULL DEFAULT '',
+  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now')),
+  diperbarui_pada TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS tagihan (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  penyewa_id INTEGER NOT NULL REFERENCES penyewa(id) ON DELETE CASCADE,
+  kontrak_id INTEGER REFERENCES kontrak(id) ON DELETE SET NULL,
+  periode TEXT NOT NULL,
+  jatuh_tempo TEXT NOT NULL,
+  total INTEGER NOT NULL DEFAULT 0,
+  terbayar INTEGER NOT NULL DEFAULT 0,
+  sisa INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'terbuka',
+  diterbitkan_pada TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS tagihan_item (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tagihan_id INTEGER NOT NULL REFERENCES tagihan(id) ON DELETE CASCADE,
+  jenis TEXT NOT NULL DEFAULT 'sewa',
+  keterangan TEXT NOT NULL,
+  jumlah INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS pembayaran (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  penyewa_id INTEGER NOT NULL REFERENCES penyewa(id) ON DELETE CASCADE,
+  tagihan_id INTEGER REFERENCES tagihan(id) ON DELETE SET NULL,
+  periode TEXT NOT NULL DEFAULT '',
+  tgl_bayar TEXT NOT NULL DEFAULT (date('now')),
+  jumlah INTEGER NOT NULL DEFAULT 0,
+  metode TEXT NOT NULL DEFAULT 'tunai',
+  referensi TEXT NOT NULL DEFAULT '',
+  dicatat_oleh INTEGER,
+  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now')),
+  catatan TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS kategori_pengeluaran (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nama TEXT NOT NULL UNIQUE,
+  aktif INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS pengeluaran (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kategori_id INTEGER REFERENCES kategori_pengeluaran(id) ON DELETE SET NULL,
+  tgl TEXT NOT NULL DEFAULT (date('now')),
+  jumlah INTEGER NOT NULL DEFAULT 0,
+  keterangan TEXT NOT NULL,
+  penerima TEXT NOT NULL DEFAULT '',
+  bukti TEXT NOT NULL DEFAULT '',
+  dicatat_oleh INTEGER,
+  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS fasilitas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kode TEXT NOT NULL UNIQUE,
+  nama TEXT NOT NULL,
+  aktif INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS kamar_fasilitas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kamar_id INTEGER NOT NULL REFERENCES kamar(id) ON DELETE CASCADE,
+  fasilitas_id INTEGER NOT NULL REFERENCES fasilitas(id) ON DELETE CASCADE,
+  UNIQUE(kamar_id, fasilitas_id)
+);
+
+CREATE TABLE IF NOT EXISTS denda_konfig (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  aktif INTEGER NOT NULL DEFAULT 1,
+  denda_per_hari INTEGER NOT NULL DEFAULT 0,
+  batas_gratis INTEGER NOT NULL DEFAULT 0,
+  berlaku_mulai TEXT NOT NULL DEFAULT (date('now'))
+);
+
+CREATE TABLE IF NOT EXISTS pengaturan_kos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  kunci TEXT NOT NULL UNIQUE,
+  nilai TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS aktivitas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  pengguna_id INTEGER REFERENCES pengguna(id) ON DELETE SET NULL,
+  aksi TEXT NOT NULL,
+  detail TEXT NOT NULL DEFAULT '',
+  ip TEXT NOT NULL DEFAULT '',
+  dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_tagihan_penyewa_periode ON tagihan(penyewa_id, periode);
+CREATE INDEX IF NOT EXISTS idx_tagihan_jatuhtempo_status ON tagihan(jatuh_tempo, status);
+CREATE INDEX IF NOT EXISTS idx_pembayaran_tgl ON pembayaran(tgl_bayar);
+CREATE INDEX IF NOT EXISTS idx_pengeluaran_tgl ON pengeluaran(tgl);
+CREATE INDEX IF NOT EXISTS idx_kontrak_penyewa_status ON kontrak(penyewa_id, status);
 `;
 
 export function migrasi(db) {
