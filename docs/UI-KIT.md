@@ -46,8 +46,8 @@ src/
 |---|---|---|
 | **Foundation** | `Icon`, `Avatar` | SVG sprite, inisial avatar |
 | **Feedback** | `Alert`, `Toast`, `Modal`, `Confirm`, `EmptyState`, `Progress`, `Skeleton`, `Spinner` | Notifikasi, dialog, loading |
-| **Data Display** | `StatCard`, `Card`, `Table`, `DataTable`, `BarChart`, `SectionTitle` | Kartu statistik, tabel, grafik batang |
-| **Form** | `Input`, `Select`, `Textarea`, `Checkbox`, `Radio`, `Toggle`, `Label`, `HelpText`, `Field` | Form lengkap + validasi UI |
+| **Data Display** | `StatCard`, `Card`, `Table`, `DataTable`, `DataTableServer`, `BarChart`, `SectionTitle` | Kartu statistik, tabel (client & server-side URL-synced), grafik |
+| **Form** | `Input`, `Select`, `Textarea`, `Checkbox`, `Radio`, `Toggle`, `Combobox`, `MultiSelect`, `Label`, `HelpText`, `Field` | Form lengkap + pencarian opsi |
 | **Action** | `Button`, `ButtonGroup`, `Fab` | Tombol, grup tombol, floating action button |
 | **Navigation** | `Breadcrumb`, `Tabs`, `TabPanel`, `NavLink` | Navigasi |
 | **Misc** | `Badge`, `Tooltip`, `Kbd` | Chip/badge, tooltip, keyboard hint |
@@ -64,10 +64,16 @@ cd kosku-ui
 # 2) Install
 npm install
 
-# 3) Dev (otomatis pakai dev secret)
+# 3) Seed database (WAJIB — sekali saja)
+npm run seed
+# non-interaktif: EMAIL=a@b.c SANDI=rahasia123 npm run seed
+
+# 4) Dev (otomatis pakai dev secret)
 npm run dev
 # buka http://localhost:3000
 ```
+
+Katalog komponen interaktif tersedia di aplikasi: **`/kit`**.
 
 **Login demo (dev):**
 - `owner@kosku.test` / `password123`
