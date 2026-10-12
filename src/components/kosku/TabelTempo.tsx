@@ -48,7 +48,10 @@ export function TabelTempo({ baris }: { baris: BarisTempo[] }) {
     setSedangProses(id);
     mulai(async () => {
       const hasil = await tandaiLunasAction(id);
-      setPesan({ nada: hasil.error ? "danger" : "ok", teks: hasil.error ?? hasil.sukses ?? "Selesai." });
+      setPesan({
+        nada: hasil.error ? "danger" : "ok",
+        teks: hasil.error ?? hasil.sukses ?? `Tagihan ${nama} ditandai lunas.`,
+      });
       setSedangProses(null);
     });
   };

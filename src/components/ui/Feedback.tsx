@@ -25,11 +25,6 @@ export type Toast = {
   durasi?: number;
 };
 
-type KonteksToast = {
-  tampilkan: (t: Omit<Toast, "id">) => number;
-  tutup: (id: number) => void;
-};
-
 let penampilLuar: ((t: Omit<Toast, "id">) => number) | null = null;
 
 /** Panggil dari mana pun (termasuk event handler) tanpa Context. */

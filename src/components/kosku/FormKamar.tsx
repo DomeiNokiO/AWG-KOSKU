@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { tambahPenyewaAction, simpanKamarAction, type Hasil } from "@/actions/kosku";
 import { Button } from "@/components/ui/Button";
-import { Input, Select, Textarea } from "@/components/ui/Form";
+import { Input, Select } from "@/components/ui/Form";
 import { Alert } from "@/components/ui/Feedback";
 
 /** Formulir tambah/edit kamar, dibungkus Modal oleh pemanggil. */

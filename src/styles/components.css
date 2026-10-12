@@ -886,3 +886,22 @@
   .k-app-main { padding: 0 !important; }
   .k-card { box-shadow: none; border-color: #999; }
 }
+
+
+/* --------------------------------------------------------- Util tambahan */
+.k-input-sm { padding: 6px 10px; font-size: var(--k-fs-sm); }
+.k-fieldset {
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-r-md);
+  padding: var(--k-s4);
+  margin: 0;
+  display: grid;
+  gap: var(--k-s3);
+  background: var(--k-surface-2);
+}
+.k-fieldset legend {
+  font-size: var(--k-fs-xs);
+  font-weight: 600;
+  color: var(--k-muted);
+  padding: 0 6px;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Modal } from "@/components/ui/Feedback";
 import { Fab } from "@/components/ui/Fab";
 import { FormKamarModal } from "./FormKamar";
@@ -18,7 +18,6 @@ import type { KamarRingkas } from "@/lib/db";
  */
 export function KamarGrid({ kamar }: { kamar: KamarRingkas[] }) {
   const [buka, setBuka] = useState(false);
-  const [pending, mulai] = useTransition();
 
   return (
     <>
@@ -32,10 +31,7 @@ export function KamarGrid({ kamar }: { kamar: KamarRingkas[] }) {
 
       <Modal buka={buka} judul="Tambah Kamar" onTutup={() => setBuka(false)}>
         <FormKamarModal
-          onTutup={() => {
-            setBuka(false);
-            mulai(() => undefined);
-          }}
+          onTutup={() => setBuka(false)}
         />
       </Modal>
     </>

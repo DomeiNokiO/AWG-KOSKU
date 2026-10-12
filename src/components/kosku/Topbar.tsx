@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/Icon";
 import { Avatar } from "@/components/ui/Icon";
 import { Menu, MenuItem } from "@/components/ui/Feedback";
@@ -17,7 +18,20 @@ import type { Sesi } from "@/lib/sesi";
  */
 
 export function Topbar({ sesi, judul }: { sesi: Sesi; judul: string }) {
+  const router = useRouter();
   const [pasang, setPasang] = useState<"siap" | "terpasang" | "takDidukung">("siap");
+
+  /** Navigasi dalam aplikasi wajib lewat router (bukan window.location) —
+   *  mempertahankan cache RSC & mencegah reload penuh yang membuang state. */
+  const pergi = (ke: string) => () => router.push(ke);
+
+  /** Unduhan CSV: memicu <a programatik>, bukan navigasi halaman. */
+  const unduhCsv = () => {
+    const a = document.createElement("a");
+    a.href = "/api/laporan/csv";
+    a.download = "laporan-kosku.csv";
+    a.click();
+  };
 
   const pasangAplikasi = () => {
     // PWA belum disertakan di v1.0; tombol tetap ada agar struktur UI sesuai
@@ -59,17 +73,17 @@ export function Topbar({ sesi, judul }: { sesi: Sesi; judul: string }) {
           )}
         >
           <p className="k-menu-label">{sesi.email}</p>
-          <MenuItem ikon="user" petunjuk={sesi.peran} onPilih={() => (window.location.href = "/setting")}>
+          <MenuItem ikon="user" petunjuk={sesi.peran} onPilih={pergi("/setting")}>
             {sesi.nama}
           </MenuItem>
           <div className="k-menu-sep" />
-          <MenuItem ikon="gear" onPilih={() => (window.location.href = "/setting")}>
+          <MenuItem ikon="gear" onPilih={pergi("/setting")}>
             Setting akun
           </MenuItem>
-          <MenuItem ikon="sparkle" onPilih={() => (window.location.href = "/kit")}>
+          <MenuItem ikon="sparkle" onPilih={pergi("/kit")}>
             UI Kit
           </MenuItem>
-          <MenuItem ikon="bug" onPilih={() => (window.location.href = "/laporan-bug")}>
+          <MenuItem ikon="bug" onPilih={pergi("/laporan-bug")}>
             Laporkan bug
           </MenuItem>
           <div className="k-menu-sep" />
@@ -78,7 +92,9 @@ export function Topbar({ sesi, judul }: { sesi: Sesi; judul: string }) {
             bahaya
             onPilih={async () => {
               await fetch("/api/auth/logout", { method: "POST" });
-              window.location.assign("/masuk?keluar=1");
+              // Router + refresh: buang cache RSC sesi lama tanpa location assign.
+              router.push("/masuk?keluar=1");
+              router.refresh();
             }}
           >
             Keluar
@@ -93,10 +109,10 @@ export function Topbar({ sesi, judul }: { sesi: Sesi; judul: string }) {
           )}
         >
           <p className="k-menu-label">Pintasan</p>
-          <MenuItem ikon="table" onPilih={() => (window.location.href = "/pembayaran")}>
+          <MenuItem ikon="table" onPilih={pergi("/pembayaran")}>
             Semua tagihan
           </MenuItem>
-          <MenuItem ikon="download" onPilih={() => (window.location.href = "/api/laporan/csv")}>
+          <MenuItem ikon="download" onPilih={unduhCsv}>
             Ekspor CSV
           </MenuItem>
           <MenuItem ikon="printer" onPilih={() => window.print()}>

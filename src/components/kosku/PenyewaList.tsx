@@ -70,7 +70,7 @@ export function PenyewaList({ penyewa }: { penyewa: PenyewaRingkas[] }) {
               Keluar
             </Button>
           ) : (
-            <Button jenis="outline" ukuran="sm" ikon="refresh" onClick={() => mulai(() => void ubahStatusPenyewaAction(p.id, "aktif"))}>
+            <Button jenis="outline" ukuran="sm" ikon="refresh" memuat={pending} onClick={() => mulai(() => void ubahStatusPenyewaAction(p.id, "aktif"))}>
               Aktifkan
             </Button>
           )}

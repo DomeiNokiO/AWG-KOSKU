@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Icon } from "./Icon";
 import { Button, ButtonGroup } from "./Button";
@@ -33,7 +33,7 @@ export type DataTableServerProps<T> = {
   debounceMs?: number;
 };
 
-export function DataTableServer<T extends Record<string, any>>({
+export function DataTableServer<T extends Record<string, unknown>>({
   kolom,
   ambilData,
   defaultLimit = 10,
@@ -54,28 +54,43 @@ export function DataTableServer<T extends Record<string, any>>({
   const [cari, setCari] = useState(sp.get("q") ?? sp.get("search") ?? "");
   const [loading, start] = useTransition();
 
+  // Kunci stabil untuk filters: objek literal di komponen induk berbeda tiap
+  // render, tapi JSON-nya identik — tanpa ini params ikut berubah tiap render
+  // dan useEffect refetch menjadi loop tak berujung.
+  const kunciFilters = JSON.stringify(filters);
+
   const params = useMemo(() => {
     const p: PaginasiParams = {
       page: Number(sp.get("page") || 1),
       limit: Number(sp.get("limit") || defaultLimit),
       search: sp.get("q") ?? sp.get("search") ?? "",
       sort: sp.get("sort") ?? defaultSort,
-      order: (sp.get("order") === "asc" ? "asc" : "desc") as "asc" | "desc",
+      // `defaultOrder` dipakai saat URL belum punya order — sebelumnya abaikan
+      // prop ini sehingga selalu "desc" walau dikirim "asc".
+      order: (sp.get("order") ?? defaultOrder) === "asc" ? "asc" : "desc",
     };
-    Object.entries(filters).forEach(([k, v]) => {
-      if (v !== undefined && v !== null && String(v) !== "") (p as any)[k] = v;
+    const f = JSON.parse(kunciFilters) as Record<string, unknown>;
+    Object.entries(f).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && String(v) !== "") (p as Record<string, unknown>)[k] = v;
     });
     return p;
-  }, [sp, defaultLimit, defaultSort, defaultOrder, filters]);
+  }, [sp, defaultLimit, defaultSort, defaultOrder, kunciFilters]);
 
+  // Ref, bukan state: menandai "sudah mount" tidak boleh memicu render ulang
+  // (rule react-hooks/set-state-in-effect).
+  const sudahPernah = useRef(false);
   useEffect(() => {
+    let batal = false;
     start(async () => {
       const res = await ambilData(params);
-      setData(res);
+      if (!batal) setData(res);
     });
+    return () => { batal = true; };
   }, [params, ambilData]);
 
+  // Lompati debounce saat mount supaya URL bersih tidak di-replace tanpa perlu.
   useEffect(() => {
+    if (!sudahPernah.current) { sudahPernah.current = true; return; }
     const t = setTimeout(() => {
       const q = new URLSearchParams(sp.toString());
       if (cari) q.set("q", cari); else q.delete("q");
@@ -83,6 +98,7 @@ export function DataTableServer<T extends Record<string, any>>({
       router.replace(`${pathname}?${q.toString()}`, { scroll: false });
     }, debounceMs);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cari]);
 
   const ubahUrut = (k: string) => {
@@ -123,7 +139,7 @@ export function DataTableServer<T extends Record<string, any>>({
         </select>
       </div>
 
-      <div className="k-table-wrap k-table-cards">
+      <div className="k-table-wrap k-table-cards" style={{ opacity: loading && data ? 0.6 : 1, transition: "opacity .15s" }}>
         <table className="k-table">
           <thead>
             <tr>
@@ -141,11 +157,11 @@ export function DataTableServer<T extends Record<string, any>>({
             ) : data && data.data.length === 0 ? (
               <tr><td colSpan={kolom.length + (aksiBaris?1:0)} className="k-t-center k-t-muted" style={{padding:32}}>{kosong}</td></tr>
             ) : data ? (
-              data.data.map((r, i) => (
-                <tr key={i} onClick={() => onBarisKlik?.(r)} style={onBarisKlik?{cursor:"pointer"}:{}}>
+              data.data.map((r) => (
+                <tr key={String((r as { id?: unknown }).id ?? JSON.stringify(r).slice(0, 64))} onClick={() => onBarisKlik?.(r)} style={onBarisKlik?{cursor:"pointer"}:{}}>
                   {kolom.map((k) => (
                     <td key={String(k.kunci)} data-label={k.judul}>
-                      {k.sel ? k.sel(r) : String(k.nilai ? k.nilai(r) : (r as any)[k.kunci] ?? "-")}
+                      {k.sel ? k.sel(r) : String(k.nilai ? k.nilai(r) : (r as Record<string, unknown>)[String(k.kunci)] ?? "-")}
                     </td>
                   ))}
                   {aksiBaris && <td data-label="Aksi"><span className="k-row-actions">{aksiBaris(r)}</span></td>}

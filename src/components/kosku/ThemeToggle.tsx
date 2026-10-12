@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -14,15 +14,19 @@ import { Icon } from "@/components/ui/Icon";
 
 type Tema = "terang" | "gelap";
 
-export function ThemeToggle() {
-  const [tema, setTema] = useState<Tema>("terang");
-  const [siap, setSiap] = useState(false);
+function bacaTema(): Tema {
+  return document.documentElement.getAttribute("data-k-theme") === "gelap" ? "gelap" : "terang";
+}
+function dengarTema(pemanggil: () => void) {
+  window.addEventListener("kosku-tema", pemanggil);
+  return () => window.removeEventListener("kosku-tema", pemanggil);
+}
 
-  useEffect(() => {
-    const sekarang = (document.documentElement.getAttribute("data-k-theme") as Tema) ?? "terang";
-    setTema(sekarang === "gelap" ? "gelap" : "terang");
-    setSiap(true);
-  }, []);
+export function ThemeToggle() {
+  // Sumber kebenaran = atribut DOM (diset skrip awal). Dibaca lewat
+  // useSyncExternalStore: tanpa setState di effect, dan sinkron saat hidrasi.
+  const tema = useSyncExternalStore(dengarTema, bacaTema, () => "terang" as Tema);
+  const siap = useSyncExternalStore(() => () => {}, () => true, () => false);
 
   const ubah = () => {
     const baru: Tema = tema === "gelap" ? "terang" : "gelap";
@@ -32,7 +36,8 @@ export function ThemeToggle() {
     } catch {
       /* mode privat: tema tetap berlaku untuk sesi ini */
     }
-    setTema(baru);
+    // Beritahu pendengar store (useSyncExternalStore) bahwa atribut berubah.
+    window.dispatchEvent(new Event("kosku-tema"));
   };
 
   return (

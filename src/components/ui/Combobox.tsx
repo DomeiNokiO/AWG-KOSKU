@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "./Icon";
 
 /**
@@ -38,17 +38,20 @@ type Umum = {
   disabled?: boolean;
 };
 
-function pakaiSaring(opsi: Opsi[], cari: string) {
-  return useMemo(() => {
-    const k = cari.trim().toLowerCase();
-    if (!k) return opsi;
-    return opsi.filter(
-      (o) =>
-        o.label.toLowerCase().includes(k) ||
-        o.nilai.toLowerCase().includes(k) ||
-        (o.meta ?? "").toLowerCase().includes(k),
-    );
-  }, [opsi, cari]);
+/**
+ * Saring opsi. Sengaja tanpa useMemo: jumlah opsi form biasanya puluhan dan
+ * filter O(n) lebih murah daripada memoisasi — juga tidak boleh pakai hook
+ * di fungsi non-komponen (rules-of-hooks).
+ */
+function saring(opsi: Opsi[], cari: string) {
+  const k = cari.trim().toLowerCase();
+  if (!k) return opsi;
+  return opsi.filter(
+    (o) =>
+      o.label.toLowerCase().includes(k) ||
+      o.nilai.toLowerCase().includes(k) ||
+      (o.meta ?? "").toLowerCase().includes(k),
+  );
 }
 
 /* ---------------------------------------------------------------- Tunggal */
@@ -72,13 +75,13 @@ export function Combobox({
   const akar = useRef<HTMLDivElement>(null);
   const id = useId();
 
-  const hasil = pakaiSaring(opsi, cari);
+  const hasil = saring(opsi, cari);
   const terpilih = opsi.find((o) => o.nilai === nilai);
 
-  // Tutup saat klik di luar & kembalikan sorotan tiap kali dibuka.
+  // Tutup saat klik di luar. Reset sorotan dilakukan di handler pembuka,
+  // bukan di effect (react-hooks/set-state-in-effect).
   useEffect(() => {
     if (!buka) return;
-    setSorot(0);
     const onDoc = (e: MouseEvent) => {
       if (akar.current && !akar.current.contains(e.target as Node)) setBuka(false);
     };
@@ -110,10 +113,11 @@ export function Combobox({
           aria-expanded={buka}
           aria-haspopup="listbox"
           disabled={disabled}
-          onClick={() => setBuka((v) => !v)}
+          onClick={() => { setSorot(0); setBuka((v) => !v); }}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
               e.preventDefault();
+              setSorot(0);
               setBuka(true);
             }
           }}
@@ -197,7 +201,7 @@ export function MultiSelect({
   const [cari, setCari] = useState("");
   const akar = useRef<HTMLDivElement>(null);
   const id = useId();
-  const hasil = pakaiSaring(opsi, cari);
+  const hasil = saring(opsi, cari);
 
   useEffect(() => {
     if (!buka) return;

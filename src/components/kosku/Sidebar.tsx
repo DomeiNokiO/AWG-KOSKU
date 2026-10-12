@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { Confirm } from "@/components/ui/Feedback";
@@ -19,6 +19,7 @@ import type { Sesi } from "@/lib/sesi";
 
 export function Sidebar({ sesi, tunggakan }: { sesi: Sesi; tunggakan: number }) {
   const path = usePathname();
+  const router = useRouter();
   const [buka, setBuka] = useState(false);
   const [tanyaKeluar, setTanyaKeluar] = useState(false);
   const [pending, mulai] = useTransition();
@@ -27,7 +28,10 @@ export function Sidebar({ sesi, tunggakan }: { sesi: Sesi; tunggakan: number }) 
     // Endpoint POST: logout harus mengubah keadaan, jadi tidak boleh lewat
     // GET (bisa dipicu oleh <img src> di halaman lain).
     await fetch("/api/auth/logout", { method: "POST" });
-    window.location.assign("/masuk?keluar=1");
+    // push (bukan window.location) supaya cache RSC lama tidak berisi data
+    // privat sesi sebelumnya; refresh memaksa render ulang di server.
+    router.push("/masuk?keluar=1");
+    router.refresh();
   };
 
   return (
