@@ -38,6 +38,14 @@ export function bukaDb(path) {
    Skema (idempoten — aman dijalankan berulang)
    ------------------------------------------------------------------------- */
 
+/**
+ * Konversi row node:sqlite (null-prototype) menjadi objek biasa.
+ * React Flight menolak null-prototype / class saat dikirim ke Client
+ * Component — tanpa konversi ini, halaman yang meneruskan row utuh ke
+ * komponen klien gagal render.
+ */
+export const polos = (row) => (row === null || row === undefined ? row : { ...row });
+
 export const SKEMA = `
 CREATE TABLE IF NOT EXISTS pengguna (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -269,7 +277,7 @@ export function pemasukanPerBulan(db, batas = 6) {
          FROM riwayat_bayar
         GROUP BY periode ORDER BY periode DESC LIMIT ?`,
     )
-    .all(batas);
+    .all(batas).map(polos);
   return rows.reverse();
 }
 
@@ -280,7 +288,7 @@ export function pemasukanPerBulan(db, batas = 6) {
 export function daftarKamar(db) {
   return db
     .prepare("SELECT id, nomor, tipe, lantai, tarif, status FROM kamar ORDER BY lantai, nomor")
-    .all();
+    .all().map(polos);
 }
 
 export function ringkasKamar(db) {
@@ -292,7 +300,7 @@ export function ringkasKamar(db) {
     LEFT JOIN penyewa p ON p.kamar_id = k.id AND p.status = 'aktif'
         ORDER BY k.lantai, k.nomor`,
     )
-    .all();
+    .all().map(polos);
 }
 
 export function cariKamarId(db, nomor) {
@@ -351,7 +359,7 @@ export function daftarPenyewa(db, { cari = "", status = "semua" } = {}) {
          ${where}
         ORDER BY p.status = 'aktif' DESC, p.nama COLLATE NOCASE`,
     )
-    .all(...params);
+    .all(...params).map(polos);
 }
 
 export function simpanPenyewa(db, { nama, telepon, kamarId, tanggalMasuk, status = "aktif" }) {
@@ -386,7 +394,7 @@ export function tagihanBelumLunas(db, batas = 100) {
         ORDER BY date(b.jatuh_tempo) ASC, p.nama COLLATE NOCASE
         LIMIT ?`,
     )
-    .all(batas);
+    .all(batas).map(polos);
 }
 
 export function daftarPembayaran(db, { cari = "", status = "semua", periode = "" } = {}) {
@@ -417,7 +425,7 @@ export function daftarPembayaran(db, { cari = "", status = "semua", periode = ""
          ${where}
         ORDER BY date(COALESCE(b.dibayar_pada, b.jatuh_tempo)) DESC, b.id DESC`,
     )
-    .all(...params);
+    .all(...params).map(polos);
 }
 
 export function simpanTagihan(db, { penyewaId, periode, jatuhTempo, jumlah, catatan = "" }) {
@@ -494,7 +502,7 @@ export function pembayaranTerbaru(db, batas = 8) {
 export function daftarCatatan(db, batas = 20) {
   return db
     .prepare("SELECT id, judul, isi, dibuat_pada FROM catatan ORDER BY id DESC LIMIT ?")
-    .all(batas);
+    .all(batas).map(polos);
 }
 
 export function simpanCatatan(db, { judul, isi }) {
@@ -514,7 +522,7 @@ export function hapusCatatan(db, id) {
 export function daftarLaporanBug(db, batas = 20) {
   return db
     .prepare("SELECT id, pelapor, halaman, judul, isi, status, dibuat_pada FROM laporan_bug ORDER BY id DESC LIMIT ?")
-    .all(batas);
+    .all(batas).map(polos);
 }
 
 export function simpanLaporanBug(db, { pelapor, halaman, judul, isi }) {
@@ -529,7 +537,7 @@ export function ubahStatusBug(db, id, status) {
   return Number(info.changes) > 0;
 }
 
-export function paginatedQuery(db, { table, select = "*", joins = "", where = [], params = [], search = "", searchCols = [], sort = "id", sortWhitelist = [], order = "desc", page = 1, limit = 10 }) {
+export function paginatedQuery(db, { table, select = "*", joins = "", where = [], params = [], search = "", searchCols = [], sort = "id", sortWhitelist = [], sortMap = null, order = "desc", page = 1, limit = 10 }) {
   const p = [...params];
   let w = where.length ? " WHERE " + where.join(" AND ") : "";
   if (search && searchCols.length) {
@@ -537,10 +545,14 @@ export function paginatedQuery(db, { table, select = "*", joins = "", where = []
     w = w ? w + " AND (" + swhere + ")" : " WHERE (" + swhere + ")";
     for (let i = 0; i < searchCols.length; i++) p.push("%" + search + "%");
   }
-  const sortKey = (sortWhitelist.length && sortWhitelist.includes(sort)) ? sort : "id";
+  // sortMap: pemetaan kunci URL -> ekspresi SQL (mis. { id: "penyewa.id" }).
+  // WAJIB dipakai saat JOIN membuat kolom ambigu; tanpa peta, kolom polos
+  // bisa melempar "ambiguous column name" di production padahal uji lokal OK.
+  const kunciSort = (sortWhitelist.length && sortWhitelist.includes(sort)) ? sort : "id";
+  const sortKey = sortMap && sortMap[kunciSort] ? sortMap[kunciSort] : kunciSort;
   const ord = order === "asc" ? "asc" : "desc";
   const offset = Math.max(0, (page - 1) * limit);
   const total = db.prepare("SELECT COUNT(*) as c FROM " + table + " " + joins + " " + w).get(...p).c;
-  const data = db.prepare("SELECT " + select + " FROM " + table + " " + joins + " " + w + " ORDER BY " + sortKey + " " + ord + " LIMIT ? OFFSET ?").all(...p, limit, offset);
+  const data = db.prepare("SELECT " + select + " FROM " + table + " " + joins + " " + w + " ORDER BY " + sortKey + " " + ord + " LIMIT ? OFFSET ?").all(...p, limit, offset).map(polos);
   return { data, total, page, limit, pages: Math.max(1, Math.ceil(total / Math.max(1, limit))), sort: sortKey, order: ord, search };
 }

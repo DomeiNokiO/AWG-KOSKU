@@ -1,3 +1,5 @@
+import { polos } from "./db.mjs";
+
 
 /* =========================================================================
    Transaksi & laporan — modul bisnis kos
@@ -88,7 +90,7 @@ export function generateTagihan(db, { periode, jatuhTempo, metodeBasis = "kamar"
     `SELECT p.id AS penyewa_id, k.tarif
        FROM penyewa p LEFT JOIN kamar k ON k.id = p.kamar_id
       WHERE p.status = 'aktif'`,
-  ).all();
+  ).all().map(polos);
 
   const cek = db.prepare("SELECT 1 FROM pembayaran WHERE penyewa_id = ? AND periode = ?");
   const simpan = db.prepare(
@@ -124,7 +126,8 @@ export function hitungDenda(db, dendaPerHari = 0, hariIni = null) {
   LEFT JOIN kamar k ON k.id = p.kamar_id
       WHERE b.status = 'terbuka' AND date(b.jatuh_tempo) < date(?)`,
   ).all(tgl, tgl)
-   .map((r) => ({ ...r, denda: Math.max(0, Number(r.telat_hari) - gratis) * perHari }))
+   .map(polos)
+    .map((r) => ({ ...r, denda: Math.max(0, Number(r.telat_hari) - gratis) * perHari }))
    .filter((r) => r.denda > 0);
 }
 
@@ -148,7 +151,7 @@ export function simpanKonfigDenda(db, { aktif = 1, denda_per_hari = 0, batas_gra
 /* ---------------------------------------------------------------- Pengeluaran */
 
 export function daftarKategoriPengeluaran(db) {
-  return db.prepare("SELECT id, nama, aktif FROM kategori_pengeluaran ORDER BY nama COLLATE NOCASE").all();
+  return db.prepare("SELECT id, nama, aktif FROM kategori_pengeluaran ORDER BY nama COLLATE NOCASE").all().map(polos);
 }
 export function simpanKategoriPengeluaran(db, nama) {
   const info = db.prepare("INSERT INTO kategori_pengeluaran (nama) VALUES (?) ON CONFLICT(nama) DO UPDATE SET aktif = 1").run(String(nama).trim());
@@ -180,7 +183,7 @@ export function arusKas(db, { dari, sampai }) {
     `SELECT COALESCE(k.nama,'Tanpa kategori') AS kategori, SUM(p.jumlah) AS total
        FROM pengeluaran p LEFT JOIN kategori_pengeluaran k ON k.id = p.kategori_id
       WHERE date(p.tgl) BETWEEN ? AND ? GROUP BY kategori_id ORDER BY total DESC`,
-  ).all(dari, sampai);
+  ).all(dari, sampai).map(polos);
   return { pemasukan, pengeluaran, bersih: pemasukan - pengeluaran, perKategori };
 }
 
@@ -195,7 +198,7 @@ export function agingTunggakan(db, hariIni = null) {
   LEFT JOIN kamar k ON k.id = p.kamar_id
       WHERE b.status = 'terbuka'
       ORDER BY telat_hari DESC`,
-  ).all(tgl);
+  ).all(tgl).map(polos);
   const kelompok = { "1-7 hari": { jumlah: 0, total: 0 }, "8-30 hari": { jumlah: 0, total: 0 }, ">30 hari": { jumlah: 0, total: 0 } };
   for (const b of baris) {
     const h = Number(b.telat_hari);
@@ -208,7 +211,7 @@ export function agingTunggakan(db, hariIni = null) {
 
 /** Okupansi: jumlah kamar per status. */
 export function okupansi(db) {
-  return db.prepare("SELECT status, COUNT(*) AS jumlah FROM kamar GROUP BY status").all();
+  return db.prepare("SELECT status, COUNT(*) AS jumlah FROM kamar GROUP BY status").all().map(polos);
 }
 
 /** Ringkasan pemasukan per bulan (termasuk pembayaran parsial). */
@@ -216,13 +219,13 @@ export function pemasukanPeriode(db, batas = 12) {
   return db.prepare(
     `SELECT substr(tanggal,1,7) AS periode, SUM(jumlah) AS total
        FROM riwayat_bayar GROUP BY periode ORDER BY periode DESC LIMIT ?`,
-  ).all(batas).reverse();
+  ).all(batas).map(polos).reverse();
 }
 
 /* --------------------------------------------------------------- Pengaturan */
 
 export function bacaPengaturan(db) {
-  const rows = db.prepare("SELECT kunci, nilai FROM pengaturan_kos").all();
+  const rows = db.prepare("SELECT kunci, nilai FROM pengaturan_kos").all().map(polos);
   return Object.fromEntries(rows.map((r) => [r.kunci, r.nilai]));
 }
 export function simpanPengaturan(db, obj) {
@@ -241,5 +244,5 @@ export function daftarAktivitas(db, batas = 50) {
     `SELECT a.id, a.aksi, a.detail, a.dibuat_pada, u.nama
        FROM aktivitas a LEFT JOIN pengguna u ON u.id = a.pengguna_id
       ORDER BY a.id DESC LIMIT ?`,
-  ).all(batas);
+  ).all(batas).map(polos);
 }

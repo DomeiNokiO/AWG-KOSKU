@@ -5,7 +5,7 @@ import { StatCard, Card, CardBody, SectionTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Feedback";
 import { Icon } from "@/components/ui/Icon";
-import { BarChart } from "@/components/ui/DataDisplay";
+import { GrafikPemasukan } from "../laporan/GrafikPemasukan";
 import { TabelTempo } from "@/components/kosku/TabelTempo";
 import { rupiah, namaBulan, tanggal, persen } from "@/lib/core/format.mjs";
 
@@ -66,10 +66,10 @@ export default async function HalamanDashboard() {
         <Card>
           <CardHeadBulan />
           <CardBody>
-            <BarChart
+            {/* GrafikPemasukan "use client": fungsi format tidak boleh
+                dikirim lintas Server -> Client Component. */}
+            <GrafikPemasukan
               data={pemasukan.map((p) => ({ label: p.periode.slice(5) + "/" + p.periode.slice(2, 4), nilai: p.total }))}
-              format={(n) => (n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}jt` : `${Math.round(n / 1000)}rb`)}
-              label="Pemasukan enam bulan terakhir"
             />
           </CardBody>
         </Card>

@@ -3,11 +3,11 @@ import { sesiSekarang } from "@/lib/sesi";
 import { q } from "@/lib/db";
 import { Card, StatCard, SectionTitle, CardHead, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { BarChart, DataTable, type Kolom } from "@/components/ui/DataDisplay";
 import { rupiah, persen } from "@/lib/core/format.mjs";
-import type { BarisAging } from "@/lib/tipe-baris";
 import { ExportCSV } from "./ExportCSV";
 import { FilterTanggal } from "./FilterTanggal";
+import { TabelAging } from "./TabelAging";
+import { GrafikPemasukan } from "./GrafikPemasukan";
 
 export const metadata = { title: "Laporan" };
 
@@ -39,25 +39,6 @@ export default async function HalamanLaporan({
   const terisi = okup.find((o) => o.status === "terisi")?.jumlah ?? 0;
   const denda = q.hitungDenda(0);
 
-  // DataTable (client) mewajibkan `nilai` (teks, untuk cari/urut) + `sel` (tampilan).
-  const kolomAging: Kolom<BarisAging>[] = [
-    { kunci: "nama", judul: "Penyewa", nilai: (b) => b.nama, sel: (b) => b.nama },
-    { kunci: "kamar", judul: "Kamar", nilai: (b) => b.kamar ?? "-", sel: (b) => b.kamar ?? "-" },
-    { kunci: "periode", judul: "Periode", nilai: (b) => b.periode, sel: (b) => b.periode },
-    {
-      kunci: "telat_hari",
-      judul: "Telat",
-      nilai: (b) => b.telat_hari,
-      sel: (b) => <Badge tone={b.telat_hari > 30 ? "bad" : b.telat_hari > 7 ? "warn" : "netral"}>{b.telat_hari} hari</Badge>,
-    },
-    {
-      kunci: "sisa",
-      judul: "Sisa",
-      nilai: (b) => b.sisa,
-      sel: (b) => <span className="k-td-num k-td-strong">{rupiah(b.sisa)}</span>,
-    },
-  ];
-
   return (
     <>
       <SectionTitle
@@ -79,10 +60,8 @@ export default async function HalamanLaporan({
         <Card>
           <CardHead judul="Pemasukan 6 Bulan" ikon="chart-line" />
           <CardBody>
-            <BarChart
+            <GrafikPemasukan
               data={perBulan.map((p) => ({ label: p.periode.slice(5) + "/" + p.periode.slice(2, 4), nilai: p.total }))}
-              format={(n) => (n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}jt` : `${Math.round(n / 1000)}rb`)}
-              label="Pemasukan enam bulan terakhir"
             />
           </CardBody>
         </Card>
@@ -114,7 +93,7 @@ export default async function HalamanLaporan({
             ))}
           </div>
         } />
-        <DataTable kolom={kolomAging} baris={aging.baris} kosong="Tidak ada tunggakan. 🎉" />
+        <TabelAging baris={aging.baris} />
       </Card>
 
       {denda.length > 0 && (

@@ -219,7 +219,9 @@ export function daftarPenyewaPaginated(
   const status = typeof params.status === "string" ? params.status : "";
   return inti.paginatedQuery(getDb(), {
     table: "penyewa",
-    select: "penyewa.id,nama,telepon,kamar_id,kamar.nomor as kamar,tanggal_masuk,status,(SELECT COUNT(*) FROM pembayaran p WHERE p.penyewa_id=penyewa.id AND p.dibayar_pada IS NULL) as tagihan_terbuka",
+    // Kolom yang dimiliki dua tabel (status, id) WAJIB terkualifikasi —
+    // "ambiguous column name" muncul di production padahal uji parsial OK.
+    select: "penyewa.id,penyewa.nama,penyewa.telepon,penyewa.kamar_id,kamar.nomor as kamar,penyewa.tanggal_masuk,penyewa.status,(SELECT COUNT(*) FROM pembayaran p WHERE p.penyewa_id=penyewa.id AND p.dibayar_pada IS NULL) as tagihan_terbuka",
     joins: "LEFT JOIN kamar ON kamar.id=penyewa.kamar_id",
     where: status && status!=="semua" ? ["penyewa.status=?"] : [],
     params: status && status!=="semua" ? [status] : [],
@@ -227,6 +229,13 @@ export function daftarPenyewaPaginated(
     searchCols: ["penyewa.nama","penyewa.telepon","kamar.nomor"],
     sort,
     sortWhitelist: ["id","nama","kamar","tanggal_masuk","status"],
+    sortMap: {
+      id: "penyewa.id",
+      nama: "penyewa.nama",
+      kamar: "kamar.nomor",
+      tanggal_masuk: "penyewa.tanggal_masuk",
+      status: "penyewa.status",
+    },
     order,
     page,
     limit,
