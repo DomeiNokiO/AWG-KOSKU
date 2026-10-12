@@ -545,3 +545,19 @@ export function ubahStatusBug(db, id, status) {
   const info = db.prepare("UPDATE laporan_bug SET status = ? WHERE id = ?").run(status, Number(id));
   return Number(info.changes) > 0;
 }
+
+export function paginatedQuery(db, { table, select = "*", joins = "", where = [], params = [], search = "", searchCols = [], sort = "id", sortWhitelist = [], order = "desc", page = 1, limit = 10 }) {
+  const p = [...params];
+  let w = where.length ? " WHERE " + where.join(" AND ") : "";
+  if (search && searchCols.length) {
+    const swhere = searchCols.map((c) => c + " LIKE ?").join(" OR ");
+    w = w ? w + " AND (" + swhere + ")" : " WHERE (" + swhere + ")";
+    for (let i = 0; i < searchCols.length; i++) p.push("%" + search + "%");
+  }
+  const sortKey = (sortWhitelist.length && sortWhitelist.includes(sort)) ? sort : "id";
+  const ord = order === "asc" ? "asc" : "desc";
+  const offset = Math.max(0, (page - 1) * limit);
+  const total = db.prepare("SELECT COUNT(*) as c FROM " + table + " " + joins + " " + w).get(...p).c;
+  const data = db.prepare("SELECT " + select + " FROM " + table + " " + joins + " " + w + " ORDER BY " + sortKey + " " + ord + " LIMIT ? OFFSET ?").all(...p, limit, offset);
+  return { data, total, page, limit, pages: Math.max(1, Math.ceil(total / Math.max(1, limit))), sort: sortKey, order: ord, search };
+}

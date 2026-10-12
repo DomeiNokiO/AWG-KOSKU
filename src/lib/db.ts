@@ -179,3 +179,26 @@ export const q = {
 export const PERAN_SAH: readonly string[] = konstanta.PERAN_SAH;
 export const TIER_SAH: readonly string[] = konstanta.TIER_SAH;
 export type Peran = "pemilik" | "admin" | "kasir";
+
+export function daftarPenyewaPaginated(params: any = {}) {
+  const page = Number(params.page || 1);
+  const limit = Number(params.limit || 10);
+  const search = String(params.search || "");
+  const sort = String(params.sort || "id");
+  const order = params.order === "asc" ? "asc" : "desc";
+  const status = params.status;
+  return inti.paginatedQuery(db, {
+    table: "penyewa",
+    select: "penyewa.id,nama,telepon,kamar_id,kamar.nomor as kamar,tanggal_masuk,status,(SELECT COUNT(*) FROM pembayaran p WHERE p.penyewa_id=penyewa.id AND p.dibayar_pada IS NULL) as tagihan_terbuka",
+    joins: "LEFT JOIN kamar ON kamar.id=penyewa.kamar_id",
+    where: status && status!=="semua" ? ["penyewa.status=?"] : [],
+    params: status && status!=="semua" ? [status] : [],
+    search,
+    searchCols: ["penyewa.nama","penyewa.telepon","kamar.nomor"],
+    sort,
+    sortWhitelist: ["id","nama","kamar","tanggal_masuk","status"],
+    order,
+    page,
+    limit,
+  }) as any;
+}
