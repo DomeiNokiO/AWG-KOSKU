@@ -1,4 +1,6 @@
-use client;
+"use client";
+
+
 
 import { DataTableServer, type Kolom } from "@/components/ui/DataTableServer";
 import { Badge } from "@/components/ui/Badge";

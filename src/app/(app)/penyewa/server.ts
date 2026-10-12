@@ -1,3 +1,4 @@
+"use server";
 import "server-only";
 import { q } from "@/lib/db";
 import type { PaginasiParams } from "@/lib/pagination";
