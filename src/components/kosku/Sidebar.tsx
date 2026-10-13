@@ -9,7 +9,7 @@ import { NAV } from "./nav";
 import type { Sesi } from "@/lib/sesi";
 
 /**
- * KOSKU-UI — sidebar.
+ * AWG-KOSKU — sidebar.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Perilaku responsif: di bawah 900px sidebar berubah menjadi panel geser
@@ -54,7 +54,7 @@ export function Sidebar({ sesi, tunggakan }: { sesi: Sesi; tunggakan: number }) 
             <Icon name="house" size="lg" />
           </span>
           <span>
-            <span className="k-brand-name">KOSKU</span>
+            <span className="k-brand-name">AWG-KOSKU</span>
             <span className="k-brand-tag">Manajemen Kamar Kos</span>
           </span>
         </div>
@@ -117,7 +117,7 @@ export function Sidebar({ sesi, tunggakan }: { sesi: Sesi; tunggakan: number }) 
 
       <Confirm
         buka={tanyaKeluar}
-        judul="Keluar dari KOSKU?"
+        judul="Keluar dari AWG-KOSKU?"
         pesan={
           <>
             Anda akan keluar dari akun <strong>{sesi.nama}</strong>. Sesi berakhir dan Anda kembali ke halaman masuk.

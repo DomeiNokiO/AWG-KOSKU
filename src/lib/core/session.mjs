@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — tanda tangan & verifikasi token sesi (HMAC-SHA256).
+ * AWG-KOSKU — tanda tangan & verifikasi token sesi (HMAC-SHA256).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Dipisah dari Next.js (tanpa import `next/headers`) supaya dapat diuji

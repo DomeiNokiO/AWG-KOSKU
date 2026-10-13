@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { Icon, type NamaIkon } from "./Icon";
 
 /**
- * KOSKU-UI — navigasi: tab, pill, breadcrumb, pager, stepper.
+ * AWG-KOSKU — navigasi: tab, pill, breadcrumb, pager, stepper.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Catatan desain: strip tab yang perlu digeser horizontal DITOLAK untuk menu

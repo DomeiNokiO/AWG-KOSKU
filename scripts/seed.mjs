@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — seed database (npm run seed).
+ * AWG-KOSKU — seed database (npm run seed).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Membuat akun PEMILIK pertama + data contoh minimal supaya aplikasi bisa

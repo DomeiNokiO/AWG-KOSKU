@@ -15,7 +15,7 @@ import {
 import { hariIni, tambahBulan } from "@/lib/core/format.mjs";
 
 /**
- * KOSKU-UI — Server Action data operasional.
+ * AWG-KOSKU — Server Action data operasional.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Aturan yang berlaku di seluruh berkas ini:

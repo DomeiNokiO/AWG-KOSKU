@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — validasi input (skema buatan sendiri, tanpa dependensi).
+ * AWG-KOSKU — validasi input (skema buatan sendiri, tanpa dependensi).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Kenapa tidak pakai zod: satu-satunya kebutuhan proyek ini adalah

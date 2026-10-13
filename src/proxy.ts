@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * KOSKU-UI — proxy (dulu bernama "middleware" sebelum Next.js 16).
+ * AWG-KOSKU — proxy (dulu bernama "middleware" sebelum Next.js 16).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Tugasnya HANYA dua hal:

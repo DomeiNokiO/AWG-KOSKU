@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — regression lock query paginasi server-side.
+ * AWG-KOSKU — regression lock query paginasi server-side.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Kunci temuan produksi: "ambiguous column name" muncul HANYA pada sort

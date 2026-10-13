@@ -4,7 +4,7 @@ import { ToastHost } from "@/components/ui/Feedback";
 import "./globals.css";
 
 /**
- * KOSKU-UI — layout akar.
+ * AWG-KOSKU — layout akar.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Judul & deskripsi berbahasa Indonesia, tema awal ditentukan oleh skrip kecil
@@ -13,12 +13,12 @@ import "./globals.css";
  */
 
 export const metadata: Metadata = {
-  title: { default: "KOSKU — Manajemen Kamar Kos", template: "%s · KOSKU" },
+  title: { default: "AWG-KOSKU — Manajemen Kamar Kos", template: "%s · AWG-KOSKU" },
   description:
-    "KOSKU: dashboard manajemen kamar kos — kamar, penyewa, tagihan, laporan, dan catatan dalam satu tempat.",
-  applicationName: "KOSKU",
+    "AWG-KOSKU: dashboard manajemen kamar kos — kamar, penyewa, tagihan, laporan, dan catatan dalam satu tempat.",
+  applicationName: "AWG-KOSKU",
   authors: [{ name: "AWGNET-RACING & AGENT AI TEAM" }],
-  keywords: ["kost", "kos", "manajemen kamar", "dashboard", "KOSKU"],
+  keywords: ["kost", "kos", "manajemen kamar", "dashboard", "AWG-KOSKU"],
   robots: { index: false, follow: false },
 };
 

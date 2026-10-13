@@ -9,7 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import type { Sesi } from "@/lib/sesi";
 
 /**
- * KOSKU-UI — topbar.
+ * AWG-KOSKU — topbar.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Susunan mengikuti referensi desain: judul halaman (diberikan halaman lewat

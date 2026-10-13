@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "./Icon";
 
 /**
- * KOSKU-UI — Combobox (select dengan pencarian) & MultiSelect.
+ * AWG-KOSKU — Combobox (select dengan pencarian) & MultiSelect.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Kenapa bukan `<select>` biasa: pilihan kamar/penyewa bisa ratusan dan

@@ -6,7 +6,7 @@ import { rupiah } from "@/lib/core/format.mjs";
 import type { BarisAging } from "@/lib/tipe-baris";
 
 /**
- * KOSKU-UI — tabel aging tunggakan.
+ * AWG-KOSKU — tabel aging tunggakan.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * "use client" WAJIB di sini: daftar kolom berisi fungsi (nilai/sel) tidak

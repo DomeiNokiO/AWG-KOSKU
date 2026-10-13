@@ -3,7 +3,7 @@
 import { BarChart } from "@/components/ui/DataDisplay";
 
 /**
- * KOSKU-UI — grafik pemasukan per bulan.
+ * AWG-KOSKU — grafik pemasukan per bulan.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * "use client" karena fungsi `format` tidak boleh dikirim lintas batas

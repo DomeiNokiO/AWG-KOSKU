@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { MasukForm } from "./MasukForm";
 
 /**
- * KOSKU-UI — halaman masuk.
+ * AWG-KOSKU — halaman masuk.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Rute ini publik (lihat daftar RUTE_PUBLIK di src/proxy.ts). Kalau
@@ -35,7 +35,7 @@ export default async function HalamanMasuk({
 
   return (
     <div className="k-auth">
-      <section className="k-auth-side" aria-label="Tentang KOSKU">
+      <section className="k-auth-side" aria-label="Tentang AWG-KOSKU">
         <div className="k-auth-side-inner">
           <span className="k-brand-logo" aria-hidden="true">
             <Icon name="house" size="lg" />
@@ -64,7 +64,7 @@ export default async function HalamanMasuk({
 
       <section className="k-auth-main">
         <div className="k-auth-card">
-          <h2 className="k-auth-title">Masuk ke KOSKU</h2>
+          <h2 className="k-auth-title">Masuk ke AWG-KOSKU</h2>
           <p className="k-auth-sub">Gunakan email dan kata sandi akun Anda.</p>
 
           <div style={{ marginTop: 24 }}>

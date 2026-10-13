@@ -4,7 +4,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { Icon, type NamaIkon } from "./Icon";
 
 /**
- * KOSKU-UI — tampilan data: grafik batang, sparkline, timeline, accordion,
+ * AWG-KOSKU — tampilan data: grafik batang, sparkline, timeline, accordion,
  * tabel dengan pencarian & pengurutan, dan tabel kartu untuk layar sempit.
  * Author: AWGNET-RACING & AGENT AI TEAM
  */

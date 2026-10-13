@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Icon, type NamaIkon } from "./Icon";
 
 /**
- * KOSKU-UI — kartu.
+ * AWG-KOSKU — kartu.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Struktur yang didukung: head (judul + aksi), body, foot. Semua bagian

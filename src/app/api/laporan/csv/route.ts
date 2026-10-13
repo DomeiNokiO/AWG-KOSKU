@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   const baris = (arr: unknown[]) => arr.map(csvField).join(",");
 
   const csv = [
-    baris(["KOSKU — Laporan Arus Kas"]),
+    baris(["AWG-KOSKU — Laporan Arus Kas"]),
     baris(["Rentang", dari, "s.d.", sampai]),
     "",
     baris(["Ringkasan"]),

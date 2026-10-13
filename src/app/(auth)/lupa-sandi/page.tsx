@@ -6,7 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 export const metadata: Metadata = { title: "Lupa Kata Sandi" };
 
 /**
- * KOSKU-UI — halaman lupa kata sandi.
+ * AWG-KOSKU — halaman lupa kata sandi.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Pemulihan lewat email memerlukan layanan pengiriman (SMTP) yang belum
@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Lupa Kata Sandi" };
 export default function HalamanLupaSandi() {
   return (
     <div className="k-auth">
-      <section className="k-auth-side" aria-label="Tentang KOSKU">
+      <section className="k-auth-side" aria-label="Tentang AWG-KOSKU">
         <div className="k-auth-side-inner">
           <span className="k-brand-logo" aria-hidden="true">
             <Icon name="key" size="lg" />

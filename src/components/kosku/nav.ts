@@ -1,7 +1,7 @@
 import type { NamaIkon } from "@/components/ui/Icon";
 
 /**
- * KOSKU-UI — peta navigasi.
+ * AWG-KOSKU — peta navigasi.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Menu dikelompokkan persis seperti struktur aplikasi (lihat dokumen

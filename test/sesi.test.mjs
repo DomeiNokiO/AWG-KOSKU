@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — regression lock token sesi.
+ * AWG-KOSKU — regression lock token sesi.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Setiap kasus di sini adalah "serangan yang harus GAGAL": memalsukan tanda

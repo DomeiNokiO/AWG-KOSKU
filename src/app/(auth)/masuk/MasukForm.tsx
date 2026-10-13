@@ -8,7 +8,7 @@ import { Input, PasswordInput, Checkbox } from "@/components/ui/Form";
 import { Alert } from "@/components/ui/Feedback";
 
 /**
- * KOSKU-UI — formulir masuk.
+ * AWG-KOSKU — formulir masuk.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Memakai `useActionState` sehingga status "sedang memproses" dan pesan error

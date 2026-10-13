@@ -15,7 +15,7 @@ export const metadata = { title: "UI Kit" };
 export default function HalamanKit() {
   return (
     <>
-      <SectionTitle judul="UI Kit" sub="Semua komponen KOSKU dengan palet & spasi yang sama. Rujukan: docs/UI-KIT.md" />
+      <SectionTitle judul="UI Kit" sub="Semua komponen AWG-KOSKU dengan palet & spasi yang sama. Rujukan: docs/UI-KIT.md" />
 
       <div className="k-grid k-grid-2">
         <Card>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KOSKU-UI — masuk global.
+   AWG-KOSKU — masuk global.
    Urutan WAJIB: token → basis → komponen → aplikasi. Token dulu supaya semua
    lapisan di atasnya bisa merujuk variabel yang sudah terdefinisi.
    Author: AWGNET-RACING & AGENT AI TEAM

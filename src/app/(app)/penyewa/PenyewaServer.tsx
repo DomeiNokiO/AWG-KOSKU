@@ -8,7 +8,7 @@ import { ambilPenyewa } from "./server";
 import type { PenyewaRingkas } from "@/lib/db";
 
 /**
- * KOSKU-UI — tabel penyewa server-side.
+ * AWG-KOSKU — tabel penyewa server-side.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Bentuk baris = PenyewaRingkas (daftarRingkas di core/db.mjs) — tanpa

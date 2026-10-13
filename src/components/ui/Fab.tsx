@@ -5,7 +5,7 @@ import { Icon, type NamaIkon } from "./Icon";
 import { Tooltip } from "./Feedback";
 
 /**
- * KOSKU-UI — tombol aksi mengambang (FAB) & tumpukannya.
+ * AWG-KOSKU — tombol aksi mengambang (FAB) & tumpukannya.
  * Author: AWGNET-RACING & AGENT AI TEAM
  */
 

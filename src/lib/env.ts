@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * KOSKU-UI — pembacaan konfigurasi terpusat.
+ * AWG-KOSKU — pembacaan konfigurasi terpusat.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Kenapa satu modul, bukan `process.env` di mana-mana:

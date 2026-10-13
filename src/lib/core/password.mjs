@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — hashing kata sandi (scrypt).
+ * AWG-KOSKU — hashing kata sandi (scrypt).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Modul ini SENGAJA tidak punya dependensi ke Next.js supaya bisa diuji

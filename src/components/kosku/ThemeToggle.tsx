@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import { Icon } from "@/components/ui/Icon";
 
 /**
- * KOSKU-UI — saklar tema terang/gelap.
+ * AWG-KOSKU — saklar tema terang/gelap.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Tema awal sudah dipasang oleh skrip bertanda nonce di <head> supaya tidak

@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — pemformat & util tampilan (murni, tanpa efek samping).
+ * AWG-KOSKU — pemformat & util tampilan (murni, tanpa efek samping).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Ditulis sebagai modul JS polos supaya bisa diuji langsung dengan

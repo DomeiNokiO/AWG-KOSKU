@@ -6,7 +6,7 @@ import type { PaginasiParams, Paginated } from "@/lib/pagination";
 import type { BarisTagihan, BarisRiwayat, BarisPengeluaran, BarisAktivitas, BarisRincianBayar } from "@/lib/tipe-baris";
 
 /**
- * KOSKU-UI — pengambil data server-side untuk DataTable.
+ * AWG-KOSKU — pengambil data server-side untuk DataTable.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Semua parameter datang dari URL (page/limit/search/sort/order + filter) —

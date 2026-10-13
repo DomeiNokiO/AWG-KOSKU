@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { Icon, type NamaIkon } from "./Icon";
 
 /**
- * KOSKU-UI — umpan balik: toast, alert, modal, drawer, tooltip, progress,
+ * AWG-KOSKU — umpan balik: toast, alert, modal, drawer, tooltip, progress,
  * spinner, skeleton, empty state.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *

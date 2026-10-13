@@ -1,6 +1,6 @@
-# KOSKU-UI
+# AWG-KOSKU
 
-Dashboard manajemen kos (boarding house) lengkap, berbahasa Indonesia, dibangun dengan **Next.js 16 (App Router, TypeScript)** dan UI Kit kustom yang mengikuti pola desain KOSKU.
+Dashboard manajemen kos (boarding house) lengkap, berbahasa Indonesia, dibangun dengan **Next.js 16 (App Router, TypeScript)** dan UI Kit kustom yang mengikuti pola desain AWG-KOSKU.
 
 ## Fitur
 
@@ -23,7 +23,7 @@ Dashboard manajemen kos (boarding house) lengkap, berbahasa Indonesia, dibangun 
 - `src/app/(auth)/masuk` – halaman login
 - `src/app/api/` – Route Handler (export CSV, logout)
 - `src/components/ui/` – UI Kit dapat dipakai ulang
-- `src/components/kosku/` – komponen spesifik KOSKU
+- `src/components/kosku/` – komponen spesifik AWG-KOSKU
 - `src/actions/` – Server Actions (wajib sesi + peran di setiap aksi)
 - `src/lib/core/` – **satu-satunya tempat SQL** (db.mjs skema/query, bisnis.mjs aturan uang, password/session/validate) — bebas Next.js sehingga bisa diuji `node --test`
 - `src/lib/` – wrapper TypeScript (db.ts, sesi, env, tipe baris)

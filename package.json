@@ -2,7 +2,7 @@
   "name": "kosku-ui",
   "version": "1.0.0",
   "private": true,
-  "description": "KOSKU-UI — UI Kit + dashboard manajemen kamar kos, self-hosted, dengan login/logout.",
+  "description": "AWG-KOSKU — UI Kit + dashboard manajemen kamar kos, self-hosted, dengan login/logout.",
   "author": "AWGNET-RACING & AGENT AI TEAM",
   "license": "MIT",
   "scripts": {

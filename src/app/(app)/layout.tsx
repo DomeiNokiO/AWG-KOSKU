@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/kosku/Sidebar";
 import { JudulKlien } from "./judul-klien";
 
 /**
- * KOSKU-UI — kerangka halaman aplikasi (butuh sesi).
+ * AWG-KOSKU — kerangka halaman aplikasi (butuh sesi).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Pemeriksaan sesi sengaja dilakukan DUA kali: di src/proxy.ts (pintasan

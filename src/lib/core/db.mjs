@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — lapisan data (node:sqlite).
+ * AWG-KOSKU — lapisan data (node:sqlite).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Mengapa `node:sqlite`: modul SQLite sudah ada di dalam Node (>= 22), jadi

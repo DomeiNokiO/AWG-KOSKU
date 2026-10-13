@@ -9,7 +9,7 @@ import { wajibEmail, wajibTeks } from "@/lib/core/validate.mjs";
 import { rateLimit } from "@/lib/rate-limit";
 
 /**
- * KOSKU-UI — Server Action autentikasi.
+ * AWG-KOSKU — Server Action autentikasi.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Server Action adalah endpoint POST publik: siapa pun yang mengetahui

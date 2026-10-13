@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Icon, type NamaIkon } from "./Icon";
 
 /**
- * KOSKU-UI — tombol.
+ * AWG-KOSKU — tombol.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Komponen ini tidak "use client" supaya bisa dipakai di Server Component

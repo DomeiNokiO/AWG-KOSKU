@@ -10,7 +10,7 @@ import { TabelTempo } from "@/components/kosku/TabelTempo";
 import { rupiah, namaBulan, tanggal, persen } from "@/lib/core/format.mjs";
 
 /**
- * KOSKU-UI — halaman Dashboard.
+ * AWG-KOSKU — halaman Dashboard.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Empat kartu statistik atas, banner kuota tier, grafik pemasukan enam

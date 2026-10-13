@@ -5,7 +5,7 @@ import * as core from "./core/db.mjs";
 import * as bisnis from "./core/bisnis.mjs";
 
 /**
- * KOSKU-UI — akses DB untuk komponen server.
+ * AWG-KOSKU — akses DB untuk komponen server.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Modul ini hanya menambahkan tiga hal di atas `core/db.mjs`: koneksi tunggal

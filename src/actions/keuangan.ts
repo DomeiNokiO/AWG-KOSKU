@@ -8,7 +8,7 @@ import { ValidasiError, wajibInt, wajibTanggal, wajibTeks, wajibSalahSatu, tanpa
 import { rateLimit } from "@/lib/rate-limit";
 
 /**
- * KOSKU-UI — Server Action keuangan & pengaturan.
+ * AWG-KOSKU — Server Action keuangan & pengaturan.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Aturan yang sama dengan actions/kosku.ts:

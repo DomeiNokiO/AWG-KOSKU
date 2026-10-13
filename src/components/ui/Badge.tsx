@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Icon } from "./Icon";
 
 /**
- * KOSKU-UI — badge, chip, pill.
+ * AWG-KOSKU — badge, chip, pill.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Nama nada sengaja dipakai konsisten di seluruh kit supaya tidak ada kelas

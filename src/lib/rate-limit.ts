@@ -1,7 +1,7 @@
 import "server-only";
 
 /**
- * KOSKU-UI — pembatas laju sederhana (in-process).
+ * AWG-KOSKU — pembatas laju sederhana (in-process).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Cakupan: SATU proses. Kalau aplikasi dijalankan di beberapa instance,

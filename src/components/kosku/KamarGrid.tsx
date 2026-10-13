@@ -8,7 +8,7 @@ import { KartuKamar } from "./KartuKamar";
 import type { KamarRingkas } from "@/lib/db";
 
 /**
- * KOSKU-UI — grid kamar + tombol tambah kamar (FAB).
+ * AWG-KOSKU — grid kamar + tombol tambah kamar (FAB).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Grid dipakai di halaman /kamar. Setiap kamar berupa kartu penuh (bukan

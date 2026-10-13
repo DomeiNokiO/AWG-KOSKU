@@ -1,7 +1,7 @@
 import type { SVGProps } from "react";
 
 /**
- * KOSKU-UI — ikon dari sprite lokal /icons.svg.
+ * AWG-KOSKU — ikon dari sprite lokal /icons.svg.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Semua ikon berasal dari sprite yang di-host sendiri (public/icons.svg),

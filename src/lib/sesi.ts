@@ -5,7 +5,7 @@ import { q, PERAN_SAH, type Peran } from "./db";
 import { bacaTokenSesi, buatTokenSesi, namaCookie } from "./core/session.mjs";
 
 /**
- * KOSKU-UI — manajemen sesi.
+ * AWG-KOSKU — manajemen sesi.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Sesi = cookie berisi <payload>.<tanda tangan HMAC-SHA256>. Ini sesi

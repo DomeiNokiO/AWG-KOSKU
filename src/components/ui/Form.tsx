@@ -10,7 +10,7 @@ import { useId, useState } from "react";
 import { Icon, type NamaIkon } from "./Icon";
 
 /**
- * KOSKU-UI — kontrol formulir.
+ * AWG-KOSKU — kontrol formulir.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Prinsip yang dipakai:

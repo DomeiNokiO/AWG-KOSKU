@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { sesiSekarang } from "@/lib/sesi";
 
 /**
- * KOSKU-UI — gerbang akar.
+ * AWG-KOSKU — gerbang akar.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * "/" tidak punya halaman sendiri: ia hanya mengarahkan ke dashboard atau

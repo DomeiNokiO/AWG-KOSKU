@@ -1,12 +1,12 @@
-# KOSKU-UI — UI Kit Dashboard
+# AWG-KOSKU — UI Kit Dashboard
 
 **Repo:** [https://github.com/DomeiNokiO/kosku-ui](https://github.com/DomeiNokiO/kosku-ui)
 
-KOSKU-UI adalah dashboard manajemen kos berbahasa Indonesia berbasis Next.js 16 (App Router + TypeScript). Project ini sekaligus berfungsi sebagai **UI Kit** terstruktur: semua komponen UI (`src/components/ui/`) dapat dipakai ulang, terpisah dari logika bisnis KOSKU.
+AWG-KOSKU adalah dashboard manajemen kos berbahasa Indonesia berbasis Next.js 16 (App Router + TypeScript). Project ini sekaligus berfungsi sebagai **UI Kit** terstruktur: semua komponen UI (`src/components/ui/`) dapat dipakai ulang, terpisah dari logika bisnis AWG-KOSKU.
 
 ## Tujuan
 
-Mereplikasi tampilan & pengalaman dashboard KOSKU (screenshot yang dikirim user) secara **lengkap**: layout, sidebar, topbar, stat card, banner kuota, tabel jatuh tempo, form, modal, toast/alert, select, badge, tombol, FAB, dsb. Tanpa CDN (self-hosted fonts & icons).
+Mereplikasi tampilan & pengalaman dashboard AWG-KOSKU (screenshot yang dikirim user) secara **lengkap**: layout, sidebar, topbar, stat card, banner kuota, tabel jatuh tempo, form, modal, toast/alert, select, badge, tombol, FAB, dsb. Tanpa CDN (self-hosted fonts & icons).
 
 ## Tech Stack
 
@@ -16,7 +16,7 @@ Mereplikasi tampilan & pengalaman dashboard KOSKU (screenshot yang dikirim user)
 - **CSS:** Custom CSS Kit (`src/styles/`) — token, base, components, app shell (bukan Tailwind)
 - **DB:** `node:sqlite` (DatabaseSync) — SQLite lokal (`data/kosku.sqlite`)
 - **Auth:** Sesi custom HMAC-SHA256 (server-only) + `scrypt` bawaan Node
-- **Icons:** SVG sprite lokal `/public/icons.svg` (gabungan AWG + ikon KOSKU)
+- **Icons:** SVG sprite lokal `/public/icons.svg` (gabungan AWG + ikon AWG-KOSKU)
 - **Keamanan:** `server-only`, CSP nonce per-request via `src/proxy.ts`, security headers
 
 ## Struktur File Kunci
@@ -29,7 +29,7 @@ src/
 │  └─ layout.tsx    # Root layout + ToastProvider + Theme
 ├─ components/
 │  ├─ ui/           # UI KIT (Button, Card, Form, Feedback, DataDisplay, Navigation, Icon, Fab, ...)
-│  └─ kosku/        # Komponen spesifik KOSKU (Sidebar, Topbar, TabelTempo, KamarGrid, ...)
+│  └─ kosku/        # Komponen spesifik AWG-KOSKU (Sidebar, Topbar, TabelTempo, KamarGrid, ...)
 ├─ actions/         # Server Actions (auth, kosku)
 ├─ lib/
 │  ├─ core/         # Core mjs (db/session/password/validate/format) — bisa diuji node --test
@@ -99,7 +99,7 @@ Variabel env:
 
 ## Screenshot Referensi
 
-Project ini mereplikasi dashboard KOSKU yang dikirim user:
+Project ini mereplikasi dashboard AWG-KOSKU yang dikirim user:
 - 4 stat card (Total Kamar, Kamar Terisi, Kamar Kosong, Pemasukan Bulan Ini)
 - Banner "Kuota Kamar — Tier Free: X / Y Kamar" + progress + tombol "Upgrade Sekarang"
 - Tabel "Jatuh Tempo / Belum Lunas" (Penyewa, Kamar, Jatuh Tempo, Tagihan, Status Tempo, Aksi)

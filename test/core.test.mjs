@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — uji inti bisnis (tanpa Next.js).
+ * AWG-KOSKU — uji inti bisnis (tanpa Next.js).
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Semua query & aturan uang berada di src/lib/core/*.mjs supaya bisa diuji

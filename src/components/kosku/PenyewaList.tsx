@@ -13,7 +13,7 @@ import { FormPenyewaModal } from "./FormKamar";
 import type { PenyewaRingkas } from "@/lib/db";
 
 /**
- * KOSKU-UI — daftar penyewa dengan pencarian/pengurutan (DataTable),
+ * AWG-KOSKU — daftar penyewa dengan pencarian/pengurutan (DataTable),
  * FAB tambah penyewa, dan konfirmasi ketika penyewa keluar.
  */
 export function PenyewaList({ penyewa }: { penyewa: PenyewaRingkas[] }) {

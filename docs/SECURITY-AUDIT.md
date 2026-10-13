@@ -1,4 +1,4 @@
-# KOSKU-UI — Register Audit Keamanan
+# AWG-KOSKU — Register Audit Keamanan
 
 Metode: **appsec-lifecycle** (FIND → CLOSE → PREVENT). Semua temuan di bawah
 berasal dari pengujian aktif terhadap aplikasi yang berjalan (bukan membaca kode

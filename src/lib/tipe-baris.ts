@@ -1,5 +1,5 @@
 /**
- * KOSKU-UI — tipe baris hasil query.
+ * AWG-KOSKU — tipe baris hasil query.
  * Author: AWGNET-RACING & AGENT AI TEAM
  *
  * Semua SELECT didefinisikan di src/lib/core/*.mjs (tanpa tipe). Berkas ini
