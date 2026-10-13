@@ -136,6 +136,8 @@ git pull && npm ci && npm run build
 systemctl restart awg-kosku
 ```
 
+Kalau `git pull` menolak "detected dubious ownership" (instalasi lama sebelum fix ini): `git config --global --add safe.directory /opt/awg-kosku` sekali.
+
 **Backup** — jangan `cp` file SQLite saat service jalan (bisa kotor karena WAL). Aman:
 
 ```bash

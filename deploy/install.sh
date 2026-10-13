@@ -163,6 +163,10 @@ npm run build || gagal "Build gagal — perbaiki dulu sebelum lanjut."
 
 id -u "$SVC_USER" >/dev/null 2>&1 || useradd --system --home-dir "$APP_DIR" --shell /usr/sbin/nologin "$SVC_USER"
 chown -R "$SVC_USER:$SVC_USER" "$APP_DIR"
+# Repo kini milik user service; root perlu pengecualian ini supaya perintah
+# update yang dicetak di ringkasan (git pull) tidak ditolak
+# "detected dubious ownership" sejak langkah pertama.
+git config --global --add safe.directory "$APP_DIR"
 
 log "Seed akun awal ($EMAIL)..."
 runuser -u "$SVC_USER" -- env EMAIL="$EMAIL" SANDI="$SANDI" NAMA="$NAMA" node scripts/seed.mjs \
