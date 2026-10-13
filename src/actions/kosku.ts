@@ -1,8 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { q } from "@/lib/db";
-import { wajibSesi } from "@/lib/sesi";
+import { wajibSesi, wajibPeran } from "@/lib/sesi";
 import {
   ValidasiError,
   tanpaHtml,
@@ -13,6 +14,13 @@ import {
   wajibTelepon,
 } from "@/lib/core/validate.mjs";
 import { hariIni, tambahBulan } from "@/lib/core/format.mjs";
+
+/** Jejak audit: aksi yang mengubah data uang/status wajib meninggalkan jejak. */
+async function catat(aksi: string, detail = "", sesi?: { id: number }): Promise<void> {
+  const h = await headers();
+  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "lokal";
+  q.catatAktivitas({ penggunaId: sesi?.id ?? null, aksi, detail, ip });
+}
 
 /**
  * AWG-KOSKU — Server Action data operasional.
@@ -38,7 +46,8 @@ function pesanDari(e: unknown): string {
 
 export async function simpanKamarAction(_s: Hasil | undefined, fd: FormData): Promise<Hasil> {
   try {
-    await wajibSesi();
+    // Tarif & status kamar = keputusan bisnis, bukan operasi kasir harian.
+    await wajibPeran(["pemilik", "admin"]);
     const nomor = wajibTeks(fd.get("nomor"), "Nomor kamar", { min: 1, max: 12 });
     const tipe = wajibTeks(fd.get("tipe"), "Tipe", { min: 1, max: 40 });
     const lantai = wajibInt(fd.get("lantai"), "Lantai", { min: 0, max: 50 });
@@ -58,7 +67,8 @@ export async function simpanKamarAction(_s: Hasil | undefined, fd: FormData): Pr
 
 export async function tambahPenyewaAction(_s: Hasil | undefined, fd: FormData): Promise<Hasil> {
   try {
-    await wajibSesi();
+    // Mendaftarkan penyewa baru mengikat kontrak sewa — keputusan bisnis.
+    await wajibPeran(["pemilik", "admin"]);
     const nama = tanpaHtml(wajibTeks(fd.get("nama"), "Nama penyewa", { min: 2, max: 80 }));
     const telepon = wajibTelepon(fd.get("telepon"));
     const nomorKamar = wajibTeks(fd.get("kamar"), "Kamar", { min: 1, max: 12 });
@@ -88,7 +98,9 @@ export async function tambahPenyewaAction(_s: Hasil | undefined, fd: FormData): 
 
 export async function ubahStatusPenyewaAction(id: number, status: "aktif" | "keluar"): Promise<Hasil> {
   try {
-    await wajibSesi();
+    // Penyewa keluar/aktif mengubah status kamar & tanggungan tagihan — bukan
+    // operasi kasir harian. Sama seperti pembatalan pembayaran: pemilik/admin.
+    await wajibPeran(["pemilik", "admin"]);
     const sah = wajibSalahSatu(status, ["aktif", "keluar"], "Status");
     const ok = q.ubahStatusPenyewa(wajibInt(id, "id", { min: 1 }), sah);
     revalidatePath("/penyewa");
@@ -104,7 +116,8 @@ export async function ubahStatusPenyewaAction(id: number, status: "aktif" | "kel
 
 export async function tambahTagihanAction(_s: Hasil | undefined, fd: FormData): Promise<Hasil> {
   try {
-    await wajibSesi();
+    // Menciptakan utang penyewa = keputusan bisnis, bukan operasi kasir harian.
+    await wajibPeran(["pemilik", "admin"]);
     const penyewaId = wajibInt(fd.get("penyewa_id"), "Penyewa", { min: 1 });
     const periode = wajibTeks(fd.get("periode"), "Periode", { min: 7, max: 7 });
     if (!/^\d{4}-\d{2}$/.test(periode)) throw new ValidasiError("Periode harus berformat YYYY-MM.", "periode");
@@ -123,8 +136,12 @@ export async function tambahTagihanAction(_s: Hasil | undefined, fd: FormData): 
 
 export async function tandaiLunasAction(id: number): Promise<Hasil> {
   try {
-    await wajibSesi();
+    // "Tandai lunas" membuat riwayat bayar palsu tanpa uang nyata (metode
+    // transfer tak terverifikasi) — setara keputusan pemilik/admin, bukan
+    // operasi kasir. Kasir memakai bayarTagihanAction (uang nyata + jejak).
+    const sesi = await wajibPeran(["pemilik", "admin"]);
     const ok = q.tandaiLunas(wajibInt(id, "id", { min: 1 }), "transfer");
+    await catat("tandai-lunas", `Tagihan #${id} (pintasan lunas, tanpa uang masuk)`, sesi);
     revalidatePath("/dashboard");
     revalidatePath("/pembayaran");
     return ok ? { sukses: "Tagihan ditandai lunas." } : { error: "Tagihan sudah lunas atau tidak ditemukan." };
@@ -135,8 +152,11 @@ export async function tandaiLunasAction(id: number): Promise<Hasil> {
 
 export async function batalkanLunasAction(id: number): Promise<Hasil> {
   try {
-    await wajibSesi();
+    // Membatalkan status lunas menyentuh data uang yang sudah tercatat —
+    // satu tingkat dengan batalkanBayarAction: pemilik + admin, berjejak.
+    const sesi = await wajibPeran(["pemilik", "admin"]);
     const ok = q.batalkanLunas(wajibInt(id, "id", { min: 1 }));
+    await catat("batalkan-lunas", `Tagihan #${id}`, sesi);
     revalidatePath("/dashboard");
     revalidatePath("/pembayaran");
     return ok ? { sukses: "Status lunas dibatalkan." } : { error: "Tagihan belum ditandai lunas." };

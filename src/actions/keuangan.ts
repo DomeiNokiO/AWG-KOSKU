@@ -30,8 +30,7 @@ function pesanDari(e: unknown): string {
   return "Terjadi kesalahan saat menyimpan. Coba lagi.";
 }
 
-async function catat(aksi: string, detail = "") {
-  const sesi = await wajibSesi().catch(() => null);
+async function catat(aksi: string, detail = "", sesi?: { id: number }): Promise<void> {
   const h = await headers();
   const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "lokal";
   q.catatAktivitas({ penggunaId: sesi?.id ?? null, aksi, detail, ip });
@@ -82,11 +81,13 @@ export async function batalkanBayarAction(riwayatId: number): Promise<Hasil> {
 
 export async function pelunasanPenuhAction(id: number): Promise<Hasil> {
   try {
-    await wajibSesi();
+    // Pintasan "anggap lunas tunai" tanpa pencatatan uang nyata — setara
+    // tandaiLunasAction di kosku.ts: keputusan pemilik/admin, berjejak.
+    const sesi = await wajibPeran(["pemilik", "admin"]);
     const ok = q.tandaiLunas(id, "tunai");
     revalidatePath("/dashboard");
     revalidatePath("/pembayaran");
-    await catat("lunas", `Tagihan #${id}`);
+    await catat("lunas", `Tagihan #${id}`, sesi);
     return ok ? { sukses: "Tagihan ditandai lunas." } : { error: "Tagihan sudah lunas atau tidak ditemukan." };
   } catch (e) {
     return { error: pesanDari(e) };
@@ -124,7 +125,9 @@ export async function generateTagihanAction(_s: Hasil | undefined, fd: FormData)
 
 export async function simpanPengeluaranAction(_s: Hasil | undefined, fd: FormData): Promise<Hasil> {
   try {
-    const sesi = await wajibSesi();
+    // Uang KELUAR kas kos = keputusan pemilik/admin, bukan kasir harian
+    // (hapusPengeluaran sudah dibatasi setara; mencatat pun mengubah laporan).
+    const sesi = await wajibPeran(["pemilik", "admin"]);
     const kategoriId = fd.get("kategori_id") ? wajibInt(fd.get("kategori_id"), "Kategori", { min: 1 }) : null;
     const tgl = wajibTanggal(fd.get("tgl"), "tanggal");
     const jumlah = wajibInt(fd.get("jumlah"), "Jumlah", { min: 1, max: 999_999_999 });
