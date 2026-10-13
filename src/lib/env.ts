@@ -57,8 +57,6 @@ function bacaEnv() {
     cookieSecure,
     /** Nama cookie: prefix `__Host-` hanya sah bila Secure aktif. */
     cookieName: cookieSecure ? "__Host-kosku_sesi" : "kosku_sesi",
-    seedEmail: process.env.KOSKU_SEED_EMAIL?.trim() || "admin@kosku.id",
-    seedPassword: process.env.KOSKU_SEED_PASSWORD || "kosku12345",
   };
 }
 
