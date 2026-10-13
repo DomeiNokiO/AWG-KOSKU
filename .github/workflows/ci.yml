@@ -1,0 +1,49 @@
+# AWG-KOSKU — CI gate (lint, tipe, test, build) tiap push & PR.
+# Author: AWGNET-RACING & AGENT AI TEAM
+#
+# Kenapa ada: gate hijau sebelumnya hanya terbukti di mesin dev. Dengan CI,
+# push yang merusak tsc/eslint/test/build JELAS MERAH di GitHub — tidak
+# bergantung pada disiplin menjalankan gate lokal.
+#
+# Catatan versi Node: node:sqlite (dipakai src/lib/core/db.mjs) butuh
+# Node >= 22.5 — sama seperti syarat deploy/install.sh.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install (kunci package-lock.json)
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint (0 error)
+        run: npm run lint
+
+      - name: Typecheck (tsc --noEmit)
+        run: npm run typecheck
+
+      - name: Test (node --test)
+        run: npm test
+
+      - name: Build produksi (error memblokir)
+        env:
+          # Build butuh secret di NODE_ENV=production (env.ts menolak boot
+          # tanpanya). CI memakai dummy sekali pakai — bukan rahasia nyata.
+          KOSKU_SESSION_SECRET: ci-dummy-secret-hanya-untuk-tes-build-32karakter
+        run: npm run build
