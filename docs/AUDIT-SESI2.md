@@ -16,8 +16,8 @@ dugaan. Keputusan default: **PLANNING, tanpa patch** (aturan skill).
 | 5 | Menu sidebar tidak menyaring peran (kasir melihat semua menu; server tetap menolak aksinya) | app (UX) | Rendah | Bukti: `nav.ts` tanpa field peran; layout komentar menyebut HMAC+peran baca ulang DB | **Fix (UX)**: filter `NAV` per peran saat render Sidebar — server-side layout yang sudah punya sesi | OPEN |
 | 6 | CSP `style-src 'nonce-...'` vs 47 pemakaian `style={{}}` (React inline style) | app | Suspected→**Ditolak** | Uji browser: listener `securitypolicyviolation` di 5 halaman → **0 pelanggaran**; elemen inline-style terpasang normal. React menulis via CSSOM (atribut style), bukan `<style>` element — tidak kena `style-src` | Tidak ada temuan | DITOLAK (terbukti tidak berbahaya, dengan uji) |
 | 7 | `dangerouslySetInnerHTML` 1 pemakaian (`src/app/layout.tsx:51` skrip tema) | app | Ditinjau | Bukti: dipasok string konstanta statis `SKRIP_TEMA` (bukan input pengguna) + atribut `nonce` — aman by construction | **Accept** (konstanta internal, tanpa interpolasi input) | DITERIMA |
-| 8 | Tanpa CI (GitHub Actions) — gate hijau hanya terbukti di mesin dev | process | Sedang | Bukti: `ls .github` tidak ada | **Defer→disarankan CI**: lint+tsc+test+build tiap push; pemicu buka kembali: kolaborator ≥2 | OPEN (rekomendasi) |
-| 9 | Tanpa LICENSE | proses | Sedang | `ls LICENSE*` kosong — repo public tanpa lisensi = orang lain tidak boleh legal pakai | **Fix**: pilih lisensi (mis. MIT) + commit | OPEN — rekomendasi |
+| 8 | Tanpa CI (GitHub Actions) — gate hijau hanya terbukti di mesin dev | process | Sedang | Bukti: `ls .github` tidak ada | **Fix** (commit `d2cd575`): workflow lint+tsc+test+build tiap push (Node 24, secret dummy untuk build). Run pertama: SUCCESS | ✅ CLOSED (`d2cd575`) |
+| 9 | Tanpa LICENSE | proses | Sedang | `ls LICENSE*` kosong | **Accept** — repo menjadi PRIVATE dipakai pribadi (keputusan pemilik): tanpa lisensi = semua hak milik pemilik, LICENSE tak diperlukan. Bila nanti kembali public, tambahkan MIT | ✅ DITERIMA (keputusan 13 Okt 2026) |
 
 ## Temuan sebelumnya yang TETAP tertutup (diuji ulang sesi ini)
 

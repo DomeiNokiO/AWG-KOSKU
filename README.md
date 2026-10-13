@@ -31,10 +31,16 @@ Dashboard manajemen kos (boarding house) lengkap, berbahasa Indonesia, dibangun 
 
 ## Instalasi Otomatis (CT/VM baru)
 
+> **Repo PRIVATE.** Installer hanya bisa diambil dengan kredensial:
+> `git clone https://github.com/DomeiNokiO/AWG-KOSKU.git && cd AWG-KOSKU/deploy && bash install.sh`
+> (atau pakai deploy key read-only per CT/VM — lihat README bagian bawah). Untuk mesin Anda sendiri yang sudah login GitHub: clone → install.sh langsung jalan.
+
 Untuk Debian/Ubuntu kosong (Proxmox LXC, VPS, VM) — satu perintah dari kosong sampai jalan:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/DomeiNokiO/AWG-KOSKU/main/deploy/install.sh | bash
+# DARI repo hasil clone (bukan curl — repo privat):
+git clone https://github.com/DomeiNokiO/AWG-KOSKU.git /tmp/awg-kosku-src
+cd /tmp/awg-kosku-src/deploy && bash install.sh
 ```
 
 Atau unduh dulu lalu jalankan (bisa dibaca isinya sebelum dieksekusi):
