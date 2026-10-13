@@ -92,7 +92,7 @@ NODE_BIN_DIR="$(dirname "$(command -v node)")"
 # Deteksi TTY dengan MENULIS, bukan sekadar cek keberadaan /dev/tty:
 # node device selalu ada (termasuk ssh non-pty), tapi menulisnya di sesi
 # tanpa controlling terminal GAGAL -> guard ini jatuh ke mode env var.
-if [[ -e /dev/tty ]] && { : > /dev/tty; }; then
+if [[ -e /dev/tty ]] && { : > /dev/tty; } 2>/dev/null; then
   tty_rd() { read -r "$1" < /dev/tty || true; }
   if [[ -z "${PORT:-}" ]]; then
     printf 'Port HTTP [3000]: ' > /dev/tty; tty_rd PORT; PORT="${PORT:-3000}"
@@ -138,14 +138,11 @@ git clone --depth 1 "$REPO_URL" "$APP_DIR" || gagal "Clone gagal (butuh internet
 
 cd "$APP_DIR"
 
-# ------------------------------------------------------------ 5. install & build
-log "npm ci (kunci dari package-lock.json)..."
-npm ci --no-audit --no-fund || gagal "npm ci gagal."
-
-log "Build produksi (lint + typecheck ikut jalan; error memblokir)..."
-npm run build || gagal "Build gagal — perbaiki dulu sebelum lanjut."
-
-# ------------------------------------------------------------- 6. .env & akun awal
+# ------------------------------------------------- 5. .env SEBELUM build
+# Kenapa urutannya penting: `next build` mengimpor modul route (termasuk
+# env.ts) saat "collect page data" — di NODE_ENV=production tanpa
+# KOSKU_SESSION_SECRET, env.ts MELEMPAR dan build gagal. .env ada di sini
+# supaya Next memuatnya saat build, bukan hanya saat start.
 SESSION_SECRET="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(48).toString("base64url"))')"
 umask 077
 cat > .env <<EOF
@@ -156,6 +153,13 @@ KOSKU_COOKIE_SECURE=$COOKIE_SECURE
 EOF
 chmod 600 .env
 log ".env ditulis (mode 600, secret dibuat acak 48 byte)."
+
+# ------------------------------------------------------------ 6. install & build
+log "npm ci (kunci dari package-lock.json)..."
+npm ci --no-audit --no-fund || gagal "npm ci gagal."
+
+log "Build produksi (lint + typecheck ikut jalan; error memblokir)..."
+npm run build || gagal "Build gagal — perbaiki dulu sebelum lanjut."
 
 id -u "$SVC_USER" >/dev/null 2>&1 || useradd --system --home-dir "$APP_DIR" --shell /usr/sbin/nologin "$SVC_USER"
 chown -R "$SVC_USER:$SVC_USER" "$APP_DIR"
