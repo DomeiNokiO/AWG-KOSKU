@@ -36,24 +36,35 @@ export default async function HalamanDashboard() {
 
       <div className="k-grid k-grid-4">
         <StatCard nilai={r.totalKamar} label="Total Kamar" ikon="clipboard" warna="blue" />
-        <StatCard nilai={r.kamarTerisi} label="Kamar Terisi" ikon="bed" warna="green" tren={r.kamarKosong > 0 ? { arah: "up", teks: `${r.kamarKosong} kosong` } : undefined} />
-        <StatCard nilai={r.kamarKosong} label="Kamar Kosong" ikon="door" warna="orange" tren={r.kamarKosong > 0 ? { arah: "down", teks: `${r.penyewaAktif} penyewa aktif` } : undefined} />
+        <StatCard nilai={r.kamarTerisi} label="Kamar Terisi" ikon="bed" warna="green" catatan={`${r.penyewaAktif} penyewa aktif`} />
+        <StatCard nilai={r.kamarKosong} label="Kamar Kosong" ikon="door" warna="orange" catatan={`dari ${r.totalKamar} kamar`} />
         <StatCard nilai={rupiah(r.pemasukanBulanIni)} label="Pemasukan Bulan Ini" ikon="money-bill" warna="violet" catatan={r.tunggakan > 0 ? `${r.tunggakan} tunggakan` : "tidak ada tunggakan"} />
       </div>
 
-      {/* Banner kuota tier — persis referensi desain */}
+      {/* Banner kuota tier — baris info mengisi lebar, progres selebar kartu */}
       <section className="k-banner" aria-label="Kuota kamar">
         <div className="k-banner-body">
           <p className="k-banner-kicker">
             <Icon name="gauge" size="sm" /> Kuota Kamar — Tier {sesi.tier === "free" ? "Free" : sesi.tier}
           </p>
           <p className="k-banner-val">
-            {r.totalKamar} / {r.kuota} Kamar
+            {r.totalKamar} <span className="k-banner-of">/ {r.kuota} kamar terpakai</span>
           </p>
+          <div className="k-banner-stats">
+            <span className="k-banner-stat">
+              <strong>{r.kamarTerisi}</strong> terisi
+            </span>
+            <span className="k-banner-stat">
+              <strong>{r.kamarKosong}</strong> kosong
+            </span>
+            <span className="k-banner-stat">
+              <strong>{r.tunggakan}</strong> tunggakan
+            </span>
+          </div>
+          <Progress nilai={persen(r.totalKamar, r.kuota)} diAtasGelap label="Pemakaian kuota kamar" />
           <p className="k-banner-note">
             {sisaKuota > 0 ? `Sisa ${sisaKuota} kamar lagi` : "Kuota penuh — upgrade tier untuk menambah kamar"}
           </p>
-          <Progress nilai={persen(r.totalKamar, r.kuota)} diAtasGelap label="Pemakaian kuota kamar" />
         </div>
         <div className="k-banner-cta">
           <a href="/setting" className="k-btn k-btn-warn k-btn-pill k-btn-lg">

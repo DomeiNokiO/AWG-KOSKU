@@ -53,10 +53,15 @@ export function Sidebar({ sesi, tunggakan }: { sesi: Sesi; tunggakan: number }) 
           <span className="k-brand-logo" aria-hidden="true">
             <Icon name="house" size="lg" />
           </span>
-          <span>
+          <span className="k-grow">
             <span className="k-brand-name">AWG-KOSKU</span>
             <span className="k-brand-tag">Manajemen Kamar Kos</span>
           </span>
+          {/* Tombol tutup: di mobile topbar tertutup drawer, sehingga tanpa
+              tombol ini satu-satunya jalan keluar adalah menebak backdrop. */}
+          <button type="button" className="k-sb-close" aria-label="Tutup menu" onClick={() => setBuka(false)}>
+            <Icon name="x" size="sm" />
+          </button>
         </div>
 
         <nav className="k-nav">

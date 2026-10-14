@@ -140,8 +140,25 @@
   font-size: var(--k-fs-3xl); font-weight: 800; letter-spacing: -.02em;
   margin-top: var(--k-s1); line-height: 1.2;
 }
-.k-banner-note { font-size: var(--k-fs-sm); color: rgba(255,255,255,.7); margin-top: 2px; }
+/* Satuan menyusul angka besar tanpa ikut membengkak. */
+.k-banner-of { font-size: var(--k-fs-md); font-weight: 600; color: rgba(255,255,255,.72); }
+/* Tiga angka pendukung mengisi lebar banner supaya tidak menyisakan
+   ruang kosong besar di sebelah kanan CTA (banner 8:1 pernah terbaca
+   sebagai kotak biru kosong). */
+.k-banner-stats { display: flex; flex-wrap: wrap; gap: var(--k-s5); margin-top: var(--k-s3); }
+.k-banner-stat { font-size: var(--k-fs-sm); color: rgba(255,255,255,.78); }
+.k-banner-stat strong { font-size: var(--k-fs-lg); font-weight: 800; color: #fff; margin-right: 4px; }
+.k-banner-note { font-size: var(--k-fs-sm); color: rgba(255,255,255,.7); margin-top: var(--k-s2); }
+.k-banner .k-progress { margin-top: var(--k-s3); height: 10px; background: rgba(255,255,255,.22); }
+.k-banner .k-progress-fill { background: #fff; }
 .k-banner-cta { position: relative; z-index: 1; flex: 0 0 auto; }
+
+/* Banner sempit: CTA turun ke bawah dan melebar penuh. */
+@media (max-width: 560px) {
+  .k-banner { padding: var(--k-s4); gap: var(--k-s4); }
+  .k-banner-stats { gap: var(--k-s4); }
+  .k-banner-cta, .k-banner-cta .k-btn { width: 100%; }
+}
 
 /* ==========================================================================
    5. PROGRESS
